@@ -474,4 +474,58 @@ public class BookServiceImpl implements BookService {
             .bookContent(content)
             .build());
     }
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public RestResp<Void> deleteBookChapter(Long chapterId) {
+        // 1. 查询章节信息
+        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
+        if (bookChapter == null) {
+            return RestResp.fail(ErrorCodeEnum.BOOK_CHAPTER_NOT_EXIST);
+        }
+
+        Long bookId = bookChapter.getBookId();
+
+        // 2. 删除章节内容
+        QueryWrapper<BookContent> contentWrapper = new QueryWrapper<>();
+        contentWrapper.eq(DatabaseConsts.BookContentTable.COLUMN_CHAPTER_ID, chapterId);
+        bookContentMapper.delete(contentWrapper);
+
+        // 3. 删除章节记录
+        bookChapterMapper.deleteById(chapterId);
+
+        // 4. 查询该小说的剩余章节中最新的那一章（可能被删除了最后一章）
+        QueryWrapper<BookChapter> chapterQueryWrapper = new QueryWrapper<>();
+        chapterQueryWrapper.eq(DatabaseConsts.BookChapterTable.COLUMN_BOOK_ID, bookId)
+                .orderByDesc(DatabaseConsts.BookChapterTable.COLUMN_CHAPTER_NUM)
+                .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
+        BookChapter latestChapter = bookChapterMapper.selectOne(chapterQueryWrapper);
+
+        // 5. 更新小说信息（字数、最新章节）
+        BookInfo bookInfo = bookInfoMapper.selectById(bookId);
+        int updatedWordCount = Math.max(0, bookInfo.getWordCount() - bookChapter.getWordCount());
+
+        BookInfo updateBookInfo = new BookInfo();
+        updateBookInfo.setId(bookId);
+        updateBookInfo.setWordCount(updatedWordCount);
+        if (latestChapter != null) {
+            updateBookInfo.setLastChapterId(latestChapter.getId());
+            updateBookInfo.setLastChapterName(latestChapter.getChapterName());
+            updateBookInfo.setLastChapterUpdateTime(latestChapter.getUpdateTime());
+        } else {
+            // 所有章节都删完了，清空章节相关字段
+            updateBookInfo.setLastChapterId(null);
+            updateBookInfo.setLastChapterName(null);
+            updateBookInfo.setLastChapterUpdateTime(null);
+        }
+        bookInfoMapper.updateById(updateBookInfo);
+
+        // 6. 清除缓存
+        bookInfoCacheManager.evictBookInfoCache(bookId);
+
+        // 7. 发送 MQ 消息
+        amqpMsgManager.sendBookChangeMsg(bookId);
+
+        return RestResp.ok();
+    }
+
 }

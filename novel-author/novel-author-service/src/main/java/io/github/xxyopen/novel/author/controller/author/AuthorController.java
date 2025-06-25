@@ -42,6 +42,16 @@ public class AuthorController {
     private final BookFeignManager bookFeignManager;
 
     /**
+     * 章节删除接口
+     */
+    @Operation(summary = "小说章节删除接口")
+    @DeleteMapping("book/chapter/{chapterId}")
+    public RestResp<Void> deleteBookChapter(
+        @Parameter(description = "小说章节ID") @PathVariable("chapterId") Long chapterId) {
+        return bookFeignManager.deleteBookChapter(chapterId);
+    }
+
+    /**
      * 作家注册接口
      */
     @Operation(summary = "作家注册接口")
@@ -50,7 +60,6 @@ public class AuthorController {
         dto.setUserId(UserHolder.getUserId());
         return authorService.register(dto);
     }
-
     /**
      * 查询作家状态接口
      */

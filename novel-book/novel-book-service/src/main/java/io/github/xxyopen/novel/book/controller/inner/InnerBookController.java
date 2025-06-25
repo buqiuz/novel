@@ -111,5 +111,12 @@ public class InnerBookController {
     public RestResp<PageRespDto<BookChapterRespDto>> listPublishBookChapters(@RequestBody ChapterPageReqDto dto) {
         return bookService.listBookChapters(dto);
     }
-
+    /**
+     * 删除小说章节
+     */
+    @Operation(summary = "删除小说章节")
+    @DeleteMapping ("deleteBookChapter")
+    public RestResp<Void> deleteBookChapter(@Parameter(description = "小说章节ID") @RequestBody Long chapterId) {
+        return bookService.deleteBookChapter(chapterId);
+    }
 }

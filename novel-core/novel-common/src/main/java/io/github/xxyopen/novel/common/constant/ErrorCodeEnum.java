@@ -137,7 +137,11 @@ public enum ErrorCodeEnum {
     /**
      * 一级宏观错误码，中间件服务出错
      */
-    MIDDLEWARE_SERVICE_ERROR("C0100", "中间件服务出错");
+    MIDDLEWARE_SERVICE_ERROR("C0100", "中间件服务出错"),
+    /**
+     * 书章节不存在
+     */
+    BOOK_CHAPTER_NOT_EXIST("A3003", "书章节不存在");
 
     /**
      * 错误码

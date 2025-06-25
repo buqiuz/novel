@@ -57,4 +57,7 @@ public class BookFeignManager {
     }
 
 
+    public RestResp<Void> deleteBookChapter(Long chapterId) {
+        return bookFeign.deleteBookChapter(chapterId);
+    }
 }

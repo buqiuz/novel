@@ -10,6 +10,7 @@ import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -80,6 +81,12 @@ public interface BookFeign {
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/listPublishBookChapters")
     RestResp<PageRespDto<BookChapterRespDto>> listPublishBookChapters(ChapterPageReqDto dto);
 
+    /**
+     * 删除小说章节
+     */
+    @DeleteMapping (ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/deleteBookChapter")
+    RestResp<Void> deleteBookChapter(Long chapterId);
+
     @Component
     class BookFeignFallback implements BookFeign {
 
@@ -126,6 +133,11 @@ public interface BookFeign {
         @Override
         public RestResp<PageRespDto<BookChapterRespDto>> listPublishBookChapters(ChapterPageReqDto dto) {
             return RestResp.ok(PageRespDto.of(dto.getPageNum(), dto.getPageSize(), 0, new ArrayList<>(0)));
+        }
+
+        @Override
+        public RestResp<Void> deleteBookChapter(Long chapterId) {
+            return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
         }
     }
 
