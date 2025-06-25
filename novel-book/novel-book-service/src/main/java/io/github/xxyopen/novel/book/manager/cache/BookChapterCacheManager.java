@@ -5,8 +5,11 @@ import io.github.xxyopen.novel.book.dao.mapper.BookChapterMapper;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.common.constant.CacheConsts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * 小说章节 缓存管理类
@@ -35,6 +38,12 @@ public class BookChapterCacheManager {
             .chapterWordCount(bookChapter.getWordCount())
             .chapterUpdateTime(bookChapter.getUpdateTime())
             .build();
+    }
+
+    @CacheEvict(cacheManager = CacheConsts.CAFFEINE_CACHE_MANAGER,
+        value = CacheConsts.BOOK_CHAPTER_CACHE_NAME)
+    public void evictBookChapterCache(Long chapterId) {
+
     }
 
 

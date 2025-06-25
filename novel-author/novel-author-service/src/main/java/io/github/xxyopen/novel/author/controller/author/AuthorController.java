@@ -3,10 +3,7 @@ package io.github.xxyopen.novel.author.controller.author;
 import io.github.xxyopen.novel.author.dto.req.AuthorRegisterReqDto;
 import io.github.xxyopen.novel.author.manager.feign.BookFeignManager;
 import io.github.xxyopen.novel.author.service.AuthorService;
-import io.github.xxyopen.novel.book.dto.req.BookAddReqDto;
-import io.github.xxyopen.novel.book.dto.req.BookPageReqDto;
-import io.github.xxyopen.novel.book.dto.req.ChapterAddReqDto;
-import io.github.xxyopen.novel.book.dto.req.ChapterPageReqDto;
+import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
 import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
@@ -43,6 +40,19 @@ public class AuthorController {
     private final AuthorService authorService;
 
     private final BookFeignManager bookFeignManager;
+
+    /**
+     * 更新小说章节接口
+     */
+    @Operation(summary = "小说章节更新接口")
+    @PutMapping("book/chapter/{chapterId}")
+    public RestResp<Void> updateBookChapter(
+            @Parameter(description = "章节ID") @PathVariable("chapterId") Long chapterId,
+            @RequestBody ChapterUpdateReqDto chapterUpdateReqDto) {
+        chapterUpdateReqDto.setChapterId(chapterId); // 设置ID
+        chapterUpdateReqDto.setBookId(UserHolder.getAuthorId());// 设置作家ID
+        return bookFeignManager.updateBookChapter(chapterUpdateReqDto);
+    }
 
     /**
      * 章节删除接口

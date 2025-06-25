@@ -11,10 +11,7 @@ import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +92,13 @@ public interface BookFeign {
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/getBookChapter")
     RestResp<ChapterRespDto> getBookChapter(Long chapterId);
 
+    /**
+     * 更新小说章节
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/updateBookChapter")
+    RestResp<Void> updateBookChapter(@RequestBody ChapterUpdateReqDto dto);
+
+
     @Component
     class BookFeignFallback implements BookFeign {
 
@@ -157,6 +161,11 @@ public interface BookFeign {
             dto.setIsVip(0); // 默认设置为免费
 
             return RestResp.ok(dto);
+        }
+
+        @Override
+        public RestResp<Void> updateBookChapter(ChapterUpdateReqDto dto) {
+            return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
         }
 
     }

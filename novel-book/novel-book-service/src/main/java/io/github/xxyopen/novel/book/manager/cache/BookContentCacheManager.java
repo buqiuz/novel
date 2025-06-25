@@ -6,6 +6,7 @@ import io.github.xxyopen.novel.book.dao.mapper.BookContentMapper;
 import io.github.xxyopen.novel.common.constant.CacheConsts;
 import io.github.xxyopen.novel.common.constant.DatabaseConsts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -34,5 +35,11 @@ public class BookContentCacheManager {
         return bookContent.getContent();
     }
 
-
+    /**
+     * 清除小说内容缓存
+     */
+    @CacheEvict(cacheManager = CacheConsts.REDIS_CACHE_MANAGER,
+        value = CacheConsts.BOOK_CONTENT_CACHE_NAME)
+    public void evictBookContentCache(Long chapterId) {
+    }
 }

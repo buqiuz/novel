@@ -128,4 +128,13 @@ public class InnerBookController {
     public RestResp<ChapterRespDto> getBookChapter(@Parameter(description = "小说章节ID") @RequestBody  Long chapterId) {
         return bookService.getBookChapter(chapterId);
     }
+    /**
+     * 更新小说章节
+     */
+    @Operation(summary = "更新小说章节")
+    @PostMapping("updateBookChapter")
+    public RestResp<Void> updateBookChapter(@RequestBody ChapterUpdateReqDto dto) {
+        return bookService.updateBookChapter(dto);
+    }
+
 }

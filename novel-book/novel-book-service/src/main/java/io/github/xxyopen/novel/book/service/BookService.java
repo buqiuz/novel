@@ -205,4 +205,6 @@ public interface BookService {
      * @return 小说章节信息
      */
     RestResp<ChapterRespDto> getBookChapter(Long chapterId);
+
+    RestResp<Void> updateBookChapter(ChapterUpdateReqDto dto);
 }

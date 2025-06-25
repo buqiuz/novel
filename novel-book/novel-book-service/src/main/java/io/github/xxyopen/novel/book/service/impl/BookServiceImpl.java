@@ -1,6 +1,7 @@
 package io.github.xxyopen.novel.book.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.xxyopen.novel.book.dao.entity.BookChapter;
@@ -537,5 +538,73 @@ public class BookServiceImpl implements BookService {
             .chapterContent(content)
             .build());
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public RestResp<Void> updateBookChapter(ChapterUpdateReqDto dto) {
+        Long chapterId = dto.getChapterId();
+
+        // 1. 校验章节是否存在
+        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
+        if (bookChapter == null) {
+            return RestResp.fail(ErrorCodeEnum.BOOK_CHAPTER_NOT_EXIST);
+        }
+
+//        // 2. 校验是否为作者本人操作（如需要）
+        BookInfo bookInfo = bookInfoMapper.selectById(bookChapter.getBookId());
+//        if (!Objects.equals(bookInfo.getAuthorId(), dto.getAuthorId())) {
+//            return RestResp.fail(ErrorCodeEnum.USER_UN_AUTH);
+//        }
+
+        // 3. 更新章节内容表
+        UpdateWrapper<BookContent> contentWrapper = new UpdateWrapper<>();
+        contentWrapper.eq(DatabaseConsts.BookContentTable.COLUMN_CHAPTER_ID, chapterId);
+
+        BookContent updateContent = new BookContent();
+        updateContent.setChapterId(chapterId);
+        updateContent.setContent(dto.getChapterContent());
+        updateContent.setUpdateTime(LocalDateTime.now());
+        bookContentMapper.update(updateContent, contentWrapper);
+
+        // 4. 重新计算字数
+        int newWordCount = dto.getChapterContent() != null ? dto.getChapterContent().length() : 0;
+        int wordDiff = newWordCount - bookChapter.getWordCount();
+
+        // 5. 更新章节信息
+        BookChapter updateChapter = new BookChapter();
+        updateChapter.setId(chapterId);
+        updateChapter.setChapterName(dto.getChapterName());
+        updateChapter.setIsVip(dto.getIsVip());
+        updateChapter.setWordCount(newWordCount);
+        updateChapter.setUpdateTime(LocalDateTime.now());
+        bookChapterMapper.updateById(updateChapter);
+
+        // 6. 更新小说总字数
+        int updatedWordCount = Math.max(0, bookInfo.getWordCount() + wordDiff);
+        BookInfo updateBookInfo = new BookInfo();
+        updateBookInfo.setId(bookInfo.getId());
+        updateBookInfo.setWordCount(updatedWordCount);
+        updateBookInfo.setUpdateTime(LocalDateTime.now());
+
+        // 如果更新的是最新章节，也更新最新章节信息
+        if (Objects.equals(bookInfo.getLastChapterId(), chapterId)) {
+            updateBookInfo.setLastChapterName(dto.getChapterName());
+            updateBookInfo.setLastChapterUpdateTime(LocalDateTime.now());
+        }
+
+        bookInfoMapper.updateById(updateBookInfo);
+
+        // 7. 清除相关缓存（章节、内容、小说信息）
+        bookInfoCacheManager.evictBookInfoCache(bookInfo.getId());
+        bookChapterCacheManager.evictBookChapterCache(chapterId);
+        bookContentCacheManager.evictBookContentCache(chapterId);
+
+
+        // 8. MQ 通知
+        amqpMsgManager.sendBookChangeMsg(bookInfo.getId());
+
+        return RestResp.ok();
+    }
+
 
 }

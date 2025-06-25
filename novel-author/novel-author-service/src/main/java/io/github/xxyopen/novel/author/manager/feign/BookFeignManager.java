@@ -2,10 +2,7 @@ package io.github.xxyopen.novel.author.manager.feign;
 
 import io.github.xxyopen.novel.author.dto.AuthorInfoDto;
 import io.github.xxyopen.novel.author.manager.cache.AuthorInfoCacheManager;
-import io.github.xxyopen.novel.book.dto.req.BookAddReqDto;
-import io.github.xxyopen.novel.book.dto.req.BookPageReqDto;
-import io.github.xxyopen.novel.book.dto.req.ChapterAddReqDto;
-import io.github.xxyopen.novel.book.dto.req.ChapterPageReqDto;
+import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
@@ -64,5 +61,9 @@ public class BookFeignManager {
 
     public RestResp<ChapterRespDto> getBookChapter(Long chapterId) {
         return bookFeign.getBookChapter(chapterId);
+    }
+
+    public RestResp<Void> updateBookChapter(ChapterUpdateReqDto chapterUpdateReqDto) {
+        return bookFeign.updateBookChapter(chapterUpdateReqDto);
     }
 }
