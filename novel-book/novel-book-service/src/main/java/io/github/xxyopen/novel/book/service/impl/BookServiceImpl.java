@@ -308,6 +308,11 @@ public class BookServiceImpl implements BookService {
         bookInfo.setUpdateTime(LocalDateTime.now());
         // 保存小说信息
         bookInfoMapper.insert(bookInfo);
+        log.info("新插入小说ID：{}", bookInfo.getId());
+
+        // ✅ 发送 MQ 消息（事务提交后发送）
+        amqpMsgManager.sendBookChangeMsg(bookInfo.getId());
+
         return RestResp.ok();
     }
 

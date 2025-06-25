@@ -20,7 +20,7 @@ public class AmqpMsgManager {
 
     private final AmqpTemplate amqpTemplate;
 
-    @Value("${spring.amqp.enabled:false}")
+    @Value("${spring.amqp.enabled:true}")
     private boolean amqpEnabled;
 
     /**
