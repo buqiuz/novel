@@ -190,5 +190,19 @@ public interface BookService {
      */
     RestResp<List<BookInfoRespDto>> listBookInfoByIds(List<Long> bookIds);
 
+    /**
+     * 删除小说章节
+     *
+     * @param chapterId 章节ID
+     * @return void
+     */
     RestResp<Void> deleteBookChapter(Long chapterId);
+
+    /**
+     * 获取小说章节信息
+     *
+     * @param chapterId 章节ID
+     * @return 小说章节信息
+     */
+    RestResp<ChapterRespDto> getBookChapter(Long chapterId);
 }

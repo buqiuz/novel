@@ -4,6 +4,7 @@ import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
+import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.common.resp.PageRespDto;
@@ -11,6 +12,7 @@ import io.github.xxyopen.novel.common.resp.RestResp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -87,6 +89,12 @@ public interface BookFeign {
     @DeleteMapping (ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/deleteBookChapter")
     RestResp<Void> deleteBookChapter(Long chapterId);
 
+    /**
+     * 获取小说章节详情
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/getBookChapter")
+    RestResp<ChapterRespDto> getBookChapter(Long chapterId);
+
     @Component
     class BookFeignFallback implements BookFeign {
 
@@ -139,6 +147,18 @@ public interface BookFeign {
         public RestResp<Void> deleteBookChapter(Long chapterId) {
             return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
         }
+
+        @Override
+        public RestResp<ChapterRespDto> getBookChapter(Long chapterId) {
+            // 返回结构完整、字段为空的 ChapterRespDto
+            ChapterRespDto dto = new ChapterRespDto();
+            dto.setChapterName("");
+            dto.setChapterContent("");
+            dto.setIsVip(0); // 默认设置为免费
+
+            return RestResp.ok(dto);
+        }
+
     }
 
 }

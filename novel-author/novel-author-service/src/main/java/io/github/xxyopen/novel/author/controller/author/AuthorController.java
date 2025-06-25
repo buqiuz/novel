@@ -9,6 +9,7 @@ import io.github.xxyopen.novel.book.dto.req.ChapterAddReqDto;
 import io.github.xxyopen.novel.book.dto.req.ChapterPageReqDto;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
+import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
 import io.github.xxyopen.novel.common.auth.UserHolder;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.constant.SystemConfigConsts;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(ApiRouterConsts.API_AUTHOR_URL_PREFIX)
 @RequiredArgsConstructor
+@Slf4j
 public class AuthorController {
 
     private final AuthorService authorService;
@@ -49,6 +52,16 @@ public class AuthorController {
     public RestResp<Void> deleteBookChapter(
         @Parameter(description = "小说章节ID") @PathVariable("chapterId") Long chapterId) {
         return bookFeignManager.deleteBookChapter(chapterId);
+    }
+
+    /**
+     * 获取小说章节详情接口
+     */
+    @Operation(summary = "获取小说章节详情接口")
+    @GetMapping("book/chapter/{chapterId}")
+    public RestResp<ChapterRespDto> getBookChapter(
+            @Parameter(description = "小说章节ID") @PathVariable("chapterId") Long chapterId) {
+        return bookFeignManager.getBookChapter(chapterId);
     }
 
     /**

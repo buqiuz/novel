@@ -9,6 +9,7 @@ import io.github.xxyopen.novel.book.dto.req.ChapterPageReqDto;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
+import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
 import io.github.xxyopen.novel.book.feign.BookFeign;
 import io.github.xxyopen.novel.common.auth.UserHolder;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
@@ -59,5 +60,9 @@ public class BookFeignManager {
 
     public RestResp<Void> deleteBookChapter(Long chapterId) {
         return bookFeign.deleteBookChapter(chapterId);
+    }
+
+    public RestResp<ChapterRespDto> getBookChapter(Long chapterId) {
+        return bookFeign.getBookChapter(chapterId);
     }
 }

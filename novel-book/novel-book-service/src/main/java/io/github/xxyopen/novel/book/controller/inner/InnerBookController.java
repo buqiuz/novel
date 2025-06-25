@@ -4,6 +4,7 @@ import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
 import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
+import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
 import io.github.xxyopen.novel.book.service.BookService;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.PageRespDto;
@@ -118,5 +119,13 @@ public class InnerBookController {
     @DeleteMapping ("deleteBookChapter")
     public RestResp<Void> deleteBookChapter(@Parameter(description = "小说章节ID") @RequestBody Long chapterId) {
         return bookService.deleteBookChapter(chapterId);
+    }
+    /**
+     * 获取小说章节详情
+     */
+    @Operation(summary = "获取小说章节详情")
+    @PostMapping("getBookChapter")
+    public RestResp<ChapterRespDto> getBookChapter(@Parameter(description = "小说章节ID") @RequestBody  Long chapterId) {
+        return bookService.getBookChapter(chapterId);
     }
 }

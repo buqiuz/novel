@@ -527,5 +527,15 @@ public class BookServiceImpl implements BookService {
 
         return RestResp.ok();
     }
+    @Override
+    public RestResp<ChapterRespDto> getBookChapter(Long chapterId) {
+        BookChapterRespDto bookChapter = bookChapterCacheManager.getChapter(chapterId);
+        String content = bookContentCacheManager.getBookContent(chapterId);
+        return RestResp.ok(ChapterRespDto.builder()
+            .chapterName(bookChapter.getChapterName())
+            .isVip(bookChapter.getIsVip())
+            .chapterContent(content)
+            .build());
+    }
 
 }
