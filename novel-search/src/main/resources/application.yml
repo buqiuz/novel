@@ -1,5 +1,5 @@
 server:
-  port: 9050
+  port: 20008
 spring:
   profiles:
     include: common

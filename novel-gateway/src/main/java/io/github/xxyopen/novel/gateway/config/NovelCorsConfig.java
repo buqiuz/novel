@@ -20,7 +20,7 @@ public class NovelCorsConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
         // 允许的域,不要写*，否则cookie就无法使用了
-        config.addAllowedOrigin("http://localhost:1024");
+        config.addAllowedOrigin("http://localhost:20000");
         // 允许的头信息
         config.addAllowedHeader("*");
         // 允许的请求方式
