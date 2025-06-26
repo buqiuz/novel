@@ -68,6 +68,11 @@ public class ApiRouterConsts {
     public static final String SEARCH_URL_PREFIX = "/search";
 
     /**
+     * ai 模块请求路径前缀
+     */
+    public static final String AI_URL_PREFIX = "/ai";
+
+    /**
      * 前台门户首页API请求路径前缀
      */
     public static final String API_FRONT_HOME_URL_PREFIX = API_FRONT_URL_PREFIX + HOME_URL_PREFIX;
@@ -111,4 +116,9 @@ public class ApiRouterConsts {
     public static final String API_INNER_USER_URL_PREFIX =
         API_INNER_URL_PREFIX + USER_URL_PREFIX;
 
+    /**
+     * AI 微服务内部调用接口
+     */
+    public static final String API_INNER_AI_URL_PREFIX =
+        API_INNER_URL_PREFIX + AI_URL_PREFIX;
 }

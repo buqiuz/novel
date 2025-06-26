@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: novel-ai-service
+  profiles:
+    include: common
+

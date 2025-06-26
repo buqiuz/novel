@@ -1,6 +1,9 @@
 package io.github.xxyopen.novel.author.controller.author;
 
+import io.github.xxyopen.novel.ai.dto.req.AiTextRequest;
+import io.github.xxyopen.novel.ai.dto.resp.AiResponse;
 import io.github.xxyopen.novel.author.dto.req.AuthorRegisterReqDto;
+import io.github.xxyopen.novel.author.manager.feign.AiFeignManager;
 import io.github.xxyopen.novel.author.manager.feign.BookFeignManager;
 import io.github.xxyopen.novel.author.service.AuthorService;
 import io.github.xxyopen.novel.book.dto.req.*;
@@ -40,6 +43,62 @@ public class AuthorController {
     private final AuthorService authorService;
 
     private final BookFeignManager bookFeignManager;
+
+    private final AiFeignManager aiFeignManager;
+
+    /**
+     * AI 续写文本
+     */
+    @Operation(summary = "AI 续写文本")
+    @PostMapping("/ai/continue")
+    public RestResp<AiResponse> continueText(
+            @RequestParam("text") String text,
+            @RequestParam("length") Double length) {
+        AiTextRequest request = new AiTextRequest();
+        request.setText(text);
+        request.setLength(length);
+        return aiFeignManager.continueText(request);
+    }
+
+    /**
+     * AI 扩展文本
+     */
+    @Operation(summary = "AI 扩展文本")
+    @PostMapping("/ai/expand")
+    public RestResp<AiResponse> expandText(
+            @RequestParam("text") String text,
+            @RequestParam("ratio") Double ratio) {
+        AiTextRequest request = new AiTextRequest();
+        request.setText(text);
+        request.setRatio(ratio);
+        return aiFeignManager.expandText(request);
+    }
+
+    /**
+     * AI 浓缩文本
+     */
+    @Operation(summary = "AI 浓缩文本")
+    @PostMapping("/ai/condense")
+    public RestResp<AiResponse> condenseText(
+            @RequestParam("text") String text,
+            @RequestParam("ratio") Double ratio) {
+        AiTextRequest request = new AiTextRequest();
+        request.setText(text);
+        request.setRatio(ratio);
+        return aiFeignManager.condenseText(request);
+    }
+
+    /**
+     * AI 润色文本
+     */
+    @Operation(summary = "AI 润色文本")
+    @PostMapping("/ai/polish")
+    public RestResp<AiResponse> polishText(@RequestParam("text") String text) {
+        AiTextRequest request = new AiTextRequest();
+        request.setText(text);
+        return aiFeignManager.polishText(request);
+    }
+
 
     /**
      * 更新小说章节接口

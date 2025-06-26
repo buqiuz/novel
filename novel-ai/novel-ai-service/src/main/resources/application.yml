@@ -1,0 +1,26 @@
+server:
+  port: 20001
+spring:
+  profiles:
+    include: common
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.28.213.28:8848
+    ai:
+      tongyi:
+        api-key: sk-232a5143cc26411cb706e4760a64f9d5
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+management:
+  # 端点启用配置
+  endpoint:
+    logfile:
+      # 启用返回日志文件内容的端点
+      enabled: true
+      # 外部日志文件路径
+      external-file: logs/novel-ai-service.log
