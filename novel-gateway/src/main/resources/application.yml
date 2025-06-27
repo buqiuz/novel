@@ -6,7 +6,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 172.28.213.28:8848
+        server-addr: 172.21.143.236:8848
     gateway:
       routes:
         - id: novel-home-front
@@ -37,6 +37,10 @@ spring:
           uri: lb://novel-search-service
           predicates:
             - Path=/api/front/search/**
+        - id: novel-ai-front
+          uri: lb://novel-ai-service
+          predicates:
+            - Path=/api/front/ai/**
         - id: novel-author
           uri: lb://novel-author-service
           predicates:

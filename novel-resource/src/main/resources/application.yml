@@ -14,7 +14,7 @@ novel:
     # 文件上传配置
     upload:
       # 上传路径
-      path: F:\code\Specialized-Comprehensive-Design\novel-cloud
+      path: E:\Projects\novel
 
 management:
   # 端点启用配置
