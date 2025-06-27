@@ -37,6 +37,10 @@ spring:
           uri: lb://novel-search-service
           predicates:
             - Path=/api/front/search/**
+        - id: novel-ai-front
+          uri: lb://novel-ai-service
+          predicates:
+            - Path=/api/front/ai/**
         - id: novel-author
           uri: lb://novel-author-service
           predicates:

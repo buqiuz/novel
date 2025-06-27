@@ -1,6 +1,9 @@
 package io.github.xxyopen.novel.ai.service.impl;
 
 
+import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
+import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesisParam;
+import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesisResult;
 import com.alibaba.dashscope.aigc.multimodalconversation.AudioParameters;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
@@ -10,6 +13,9 @@ import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
 import io.github.xxyopen.novel.ai.service.AiService;
+import io.reactivex.Flowable;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -25,13 +31,18 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.ApiException;
+import reactor.core.publisher.Flux;
 
+@Slf4j
 @Service
 public class AiServiceImpl implements AiService {
 
+    @Value("${spring.ai.dashscope.api-key}")
+    private String dashScopeApiKey;
     private static final String model_qwen = "qwen-plus";
     private static final String model_qwen_tts = "qwen-tts";
     private static final String model_cosyvoice = "cosyvoice-v2";
+    private static final String model_wanx = "wanx2.1-t2i-turbo";
     @Override
     public String continueText(String text, Double length) {
         String prompt = "请续写以下文本，续写长度约为" + length.intValue() + "字：" + text;
@@ -58,9 +69,7 @@ public class AiServiceImpl implements AiService {
 
     private String generateWithFallback(String prompt) {
         try {
-            String protocol = "http"; // 或 "websocket"
-            String baseUrl = "https://dashscope.aliyuncs.com/api/v1";
-            Generation gen = new Generation(protocol, baseUrl);
+            Generation gen = new Generation();
             Message systemMsg = Message.builder()
                     .role(Role.SYSTEM.getValue())
                     .content("You are a helpful assistant.")
@@ -70,8 +79,7 @@ public class AiServiceImpl implements AiService {
                     .content(prompt)
                     .build();
             GenerationParam param = GenerationParam.builder()
-                    // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
-                    .apiKey("sk-232a5143cc26411cb706e4760a64f9d5")
+                    .apiKey(dashScopeApiKey)
                     .model(model_qwen)
                     .messages(Arrays.asList(systemMsg, userMsg))
                     .resultFormat(GenerationParam.ResultFormat.MESSAGE)
@@ -112,6 +120,7 @@ public class AiServiceImpl implements AiService {
 //                }
 //                System.out.println("\n音频文件已下载到本地: downloaded_audio.wav");
 //            }
+            System.out.println("\n音频合成成功，音频文件URL: " + result.getOutput().getAudio().getUrl());
             return result.getOutput().getAudio().getUrl();
         } catch (ApiException | NoApiKeyException | UploadFileException e) {
             System.out.println(e.getMessage());
@@ -121,6 +130,35 @@ public class AiServiceImpl implements AiService {
             return null;
         }
     }
+
+    //语音合成
+    @Override
+    public Flux<String> textToSpeech_qwen_tts_Flux(String text, String voiceType) {
+        try {
+            log.info("开始处理语音合成，文本: {}, 语音类型: {}", text, voiceType);
+            MultiModalConversation conv = new MultiModalConversation();
+            MultiModalConversationParam param = MultiModalConversationParam.builder()
+                    .model(model_qwen_tts)
+                    .apiKey(dashScopeApiKey)
+                    .text(text)
+                    .voice(AudioParameters.Voice.valueOf(voiceType))
+                    .build();
+
+            Flowable<MultiModalConversationResult> result = conv.streamCall(param);
+
+            // 直接返回带 Base64 前缀的音频数据
+            return Flux.from(result.map(r -> " audio/wav;base64," + r.getOutput().getAudio().getData() + "\n\n"));
+
+
+        } catch (ApiException | NoApiKeyException | UploadFileException e) {
+            System.out.println(e.getMessage());
+            return Flux.empty();
+        } catch (Exception e) {
+            System.out.println("处理语音合成时出错: " + e.getMessage());
+            return Flux.empty();
+        }
+    }
+
     @Override
     public String textToSpeech_cosyvoice(String text, String voiceType) {
         try{
@@ -142,6 +180,25 @@ public class AiServiceImpl implements AiService {
             return null;
         } catch (Exception e) {
             System.out.println("处理语音合成时出错: " + e.getMessage());
+            return null;
+        }
+    }
+    //图片生成
+    @Override
+    public String textToImage(String text) {
+        try {
+            ImageSynthesisParam param = ImageSynthesisParam.builder()
+                    .apiKey(dashScopeApiKey)
+                    .model(model_wanx)
+                    .prompt(text)
+                    .n(1)
+                    .size("1024*1024")
+                    .build();
+            ImageSynthesis imageSynthesis = new ImageSynthesis();
+            ImageSynthesisResult result = imageSynthesis.call(param);
+            return result.toString();
+        } catch (Exception e) {
+            System.out.println("文本生成图片时出错: " + e.getMessage());
             return null;
         }
     }
