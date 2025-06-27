@@ -51,7 +51,7 @@ public class AuthorController {
      */
     @Operation(summary = "AI 续写文本")
     @PostMapping("/ai/continue")
-    public RestResp<AiResponse> continueText(
+    public RestResp<String> continueText(
             @RequestParam("text") String text,
             @RequestParam("length") Double length) {
         AiTextRequest request = new AiTextRequest();
@@ -65,7 +65,7 @@ public class AuthorController {
      */
     @Operation(summary = "AI 扩展文本")
     @PostMapping("/ai/expand")
-    public RestResp<AiResponse> expandText(
+    public RestResp<String> expandText(
             @RequestParam("text") String text,
             @RequestParam("ratio") Double ratio) {
         AiTextRequest request = new AiTextRequest();
@@ -79,7 +79,7 @@ public class AuthorController {
      */
     @Operation(summary = "AI 浓缩文本")
     @PostMapping("/ai/condense")
-    public RestResp<AiResponse> condenseText(
+    public RestResp<String> condenseText(
             @RequestParam("text") String text,
             @RequestParam("ratio") Double ratio) {
         AiTextRequest request = new AiTextRequest();
@@ -93,7 +93,7 @@ public class AuthorController {
      */
     @Operation(summary = "AI 润色文本")
     @PostMapping("/ai/polish")
-    public RestResp<AiResponse> polishText(@RequestParam("text") String text) {
+    public RestResp<String> polishText(@RequestParam("text") String text) {
         AiTextRequest request = new AiTextRequest();
         request.setText(text);
         return aiFeignManager.polishText(request);

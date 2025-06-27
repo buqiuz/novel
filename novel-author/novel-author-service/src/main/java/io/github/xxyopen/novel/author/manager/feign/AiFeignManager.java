@@ -24,28 +24,28 @@ public class AiFeignManager {
     /**
      * 调用 AI 接口生成续写文本
      */
-    public RestResp<AiResponse> continueText(AiTextRequest request) {
+    public RestResp<String> continueText(AiTextRequest request) {
         return aiServiceFeign.continueText(request.getText(), request.getLength());
     }
 
     /**
      * 调用 AI 接口扩展文本
      */
-    public RestResp<AiResponse> expandText(AiTextRequest request) {
+    public RestResp<String> expandText(AiTextRequest request) {
         return aiServiceFeign.expandText(request.getText(), request.getRatio());
     }
 
     /**
      * 调用 AI 接口浓缩文本
      */
-    public RestResp<AiResponse> condenseText(AiTextRequest request) {
+    public RestResp<String> condenseText(AiTextRequest request) {
         return aiServiceFeign.condenseText(request.getText(), request.getRatio());
     }
 
     /**
      * 调用 AI 接口润色文本
      */
-    public RestResp<AiResponse> polishText(AiTextRequest request) {
+    public RestResp<String> polishText(AiTextRequest request) {
         return aiServiceFeign.polishText(request.getText());
     }
 

@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface AiServiceFeign {
 
     @PostMapping(ApiRouterConsts.API_INNER_AI_URL_PREFIX + "/continue")
-    RestResp<AiResponse> continueText(@RequestParam("text") String text, @RequestParam("length") Double length);
+    RestResp<String> continueText(@RequestParam("text") String text, @RequestParam("length") Double length);
 
     @PostMapping(ApiRouterConsts.API_INNER_AI_URL_PREFIX + "/expand")
-    RestResp<AiResponse> expandText(@RequestParam("text") String text, @RequestParam("ratio") Double ratio);
+    RestResp<String> expandText(@RequestParam("text") String text, @RequestParam("ratio") Double ratio);
 
     @PostMapping(ApiRouterConsts.API_INNER_AI_URL_PREFIX + "/condense")
-    RestResp<AiResponse> condenseText(@RequestParam("text") String text, @RequestParam("ratio") Double ratio);
+    RestResp<String> condenseText(@RequestParam("text") String text, @RequestParam("ratio") Double ratio);
 
     @PostMapping(ApiRouterConsts.API_INNER_AI_URL_PREFIX + "/polish")
-    RestResp<AiResponse> polishText(@RequestParam("text") String text);
+    RestResp<String> polishText(@RequestParam("text") String text);
 }
