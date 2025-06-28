@@ -1,6 +1,7 @@
 package io.github.xxyopen.novel.resource.service;
 
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.resource.dto.req.ImgVerifyCodeReqDto;
 import io.github.xxyopen.novel.resource.dto.resp.ImgVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.dto.resp.SmsVerifyCodeRespDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,5 +31,19 @@ public interface ResourceService {
      * */
     RestResp<String> uploadImage(MultipartFile file);
 
-    RestResp<SmsVerifyCodeRespDto> sendSmsCode(String phone) throws Exception;
+    /**
+     * 发送短信验证码
+     *
+     * @param phone 手机号
+     * @return 短信验证码响应DTO
+     */
+    RestResp<SmsVerifyCodeRespDto> sendSmsCode(String phone) ;
+
+    /**
+     * 验证图片验证码
+     *
+     * @param dto 请求DTO
+     * @return void
+     */
+    RestResp<Void> verifyImgCode(ImgVerifyCodeReqDto dto);
 }

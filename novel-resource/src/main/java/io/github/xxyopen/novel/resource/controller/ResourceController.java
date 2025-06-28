@@ -64,7 +64,7 @@ public class ResourceController {
      */
     @Operation(summary = "发送短信验证码接口")
     @GetMapping("/sms_verify_code")
-    public RestResp<SmsVerifyCodeRespDto> sendSmsCode(@RequestParam String phone) throws Exception {
+    public RestResp<SmsVerifyCodeRespDto> sendSmsCode(@RequestParam String phone) {
         return resourceService.sendSmsCode(phone);
     }
 
