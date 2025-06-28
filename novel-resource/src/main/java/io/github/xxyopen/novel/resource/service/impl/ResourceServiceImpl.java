@@ -1,10 +1,14 @@
 package io.github.xxyopen.novel.resource.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.xxyopen.novel.common.constant.CacheConsts;
+import io.github.xxyopen.novel.common.constant.DatabaseConsts;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.common.constant.SystemConfigConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.config.exception.BusinessException;
+import io.github.xxyopen.novel.resource.dao.entity.UserInfo;
+import io.github.xxyopen.novel.resource.dao.mapper.UserInfoMapper;
 import io.github.xxyopen.novel.resource.dto.req.ImgVerifyCodeReqDto;
 import io.github.xxyopen.novel.resource.dto.resp.SmsVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.dto.resp.ImgVerifyCodeRespDto;
@@ -44,6 +48,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     private final VerifyCodeManager verifyCodeManager;
     private final StringRedisTemplate stringRedisTemplate;
+    private final UserInfoMapper userInfoMapper;
 
     @Value("${novel.file.upload.path}")
     private String fileUploadPath;
@@ -87,6 +92,14 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public RestResp<SmsVerifyCodeRespDto> sendSmsCode(String phone) {
+        // 校验手机号是否已注册
+        QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_USERNAME, phone)
+                .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
+        if (userInfoMapper.selectCount(queryWrapper) > 0) {
+            throw new BusinessException(ErrorCodeEnum.USER_NAME_EXIST);
+        }
+
         String sessionId = IdWorker.get32UUID();
 
         // 生成6位验证码

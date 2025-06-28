@@ -58,14 +58,6 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ErrorCodeEnum.USER_VERIFY_CODE_ERROR);
         }
 
-        // 校验手机号是否已注册
-        QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_USERNAME, dto.getUsername())
-                .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
-        if (userInfoMapper.selectCount(queryWrapper) > 0) {
-            throw new BusinessException(ErrorCodeEnum.USER_NAME_EXIST);
-        }
-
         // 注册用户
         UserInfo userInfo = new UserInfo();
         userInfo.setPassword(

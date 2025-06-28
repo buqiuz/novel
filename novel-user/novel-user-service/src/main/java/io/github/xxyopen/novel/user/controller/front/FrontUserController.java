@@ -57,6 +57,11 @@ public class FrontUserController {
     }
 
     /**
+     * 用户删除接口
+     */
+
+
+    /**
      * 用户信息查询接口
      */
     @Operation(summary = "用户信息查询接口")
