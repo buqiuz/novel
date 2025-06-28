@@ -24,8 +24,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.lang.System;
+import java.util.Base64;
+import java.util.concurrent.Executors;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
@@ -33,6 +36,7 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.ApiException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
 @Slf4j
@@ -200,4 +204,81 @@ public class AiServiceImpl implements AiService {
             return null;
         }
     }
+
+
+    public static byte[] addWavHeader(byte[] pcmData, int sampleRate, int channels, int bitsPerSample) {
+        int byteRate = sampleRate * channels * bitsPerSample / 8;
+        int blockAlign = channels * bitsPerSample / 8;
+        int dataLength = pcmData.length;
+
+        ByteBuffer buffer = ByteBuffer.allocate(44 + dataLength);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        buffer.put("RIFF".getBytes());
+        buffer.putInt(36 + dataLength);
+        buffer.put("WAVE".getBytes());
+        buffer.put("fmt ".getBytes());
+        buffer.putInt(16); // PCM
+        buffer.putShort((short) 1); // PCM
+        buffer.putShort((short) channels);
+        buffer.putInt(sampleRate);
+        buffer.putInt(byteRate);
+        buffer.putShort((short) blockAlign);
+        buffer.putShort((short) bitsPerSample);
+        buffer.put("data".getBytes());
+        buffer.putInt(dataLength);
+        buffer.put(pcmData);
+
+        return buffer.array();
+    }
+
+    /**
+     * 使用 Qwen 模型进行语音合成，并通过 SseEmitter 实时推送音频流
+     *
+     * @return SseEmitter
+     */
+    public SseEmitter textToSpeechQwenStream(String text,String voiceType) {
+        SseEmitter emitter = new SseEmitter(0L); // 无超时限制
+
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                MultiModalConversation conv = new MultiModalConversation();
+                MultiModalConversationParam param = MultiModalConversationParam.builder()
+                        .model("qwen-tts")
+                        .text(text)
+                        .apiKey("sk-232a5143cc26411cb706e4760a64f9d5")
+                        .voice(AudioParameters.Voice.valueOf(voiceType))
+                        .build();
+
+                Flowable<MultiModalConversationResult> result = conv.streamCall(param);
+                result.blockingForEach(r -> {
+                    try {
+                        String base64Data = r.getOutput().getAudio().getData();
+                        // 添加 WAV 头后再 Base64 编码并发送
+                        byte[] audioBytes = Base64.getDecoder().decode(base64Data);
+                        if (audioBytes.length == 0) {
+                            log.warn("收到空音频数据，跳过");
+                            return;
+                        }
+                        byte[] wavData = addWavHeader(audioBytes, 24000, 1, 16); // 根据模型实际采样率
+                        String base64Wav = Base64.getEncoder().encodeToString(wavData);
+
+                        emitter.send(SseEmitter.event()
+                                .name("audioChunk")
+                                .data(base64Wav));
+
+                    } catch (Exception e) {
+                        emitter.completeWithError(e);
+                    }
+                });
+
+                emitter.complete();
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        });
+
+        return emitter;
+    }
+
 }

@@ -1,5 +1,7 @@
 package io.github.xxyopen.novel.ai.service;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
 public interface AiService {
@@ -17,4 +19,6 @@ public interface AiService {
 
     //图片生成
     String textToImage(String text);
+
+    SseEmitter textToSpeechQwenStream(String text,String voiceType);
 }
