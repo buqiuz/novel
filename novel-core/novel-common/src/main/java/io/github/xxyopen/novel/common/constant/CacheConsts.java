@@ -86,6 +86,12 @@ public class CacheConsts {
         REDIS_CACHE_PREFIX + "imgVerifyCodeCache::";
 
     /**
+     * 短信验证码缓存 KEY
+     */
+    public static final String SMS_VERIFY_CODE_CACHE_KEY =
+        REDIS_CACHE_PREFIX + "smsVerifyCodeCache::";
+
+    /**
      * 用户信息缓存
      */
     public static final String USER_INFO_CACHE_NAME = "userInfoCache";

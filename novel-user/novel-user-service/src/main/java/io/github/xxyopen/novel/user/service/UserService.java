@@ -86,4 +86,11 @@ public interface UserService {
      * @return 用户信息列表
      */
     RestResp<List<UserInfoRespDto>> listUserInfoByIds(List<Long> userIds);
+
+
+    /**
+     * 删除用户
+     * @param userId
+     */
+    RestResp<Void> delete(Long userId);
 }

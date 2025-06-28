@@ -65,6 +65,11 @@ public enum ErrorCodeEnum {
     USER_PASSWORD_ERROR("A0210", "用户密码错误"),
 
     /**
+     * 用户删除失败
+     */
+    USER_DELETE_ERROR("A0220", "用户删除失败"),
+
+    /**
      * 二级宏观错误码，用户请求参数错误
      */
     USER_REQUEST_PARAM_ERROR("A0400", "用户请求参数错误"),
@@ -141,7 +146,12 @@ public enum ErrorCodeEnum {
     /**
      * 书章节不存在
      */
-    BOOK_CHAPTER_NOT_EXIST("A3003", "书章节不存在");
+    BOOK_CHAPTER_NOT_EXIST("A3003", "书章节不存在"),
+
+    /**
+     * 用户发送短信验证码异常
+     */
+    USER_SEND_SMS_ERROR("A3004","用户发送短信验证码失败" );
 
     /**
      * 错误码

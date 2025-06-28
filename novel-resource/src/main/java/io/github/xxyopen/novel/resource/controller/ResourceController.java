@@ -2,7 +2,9 @@ package io.github.xxyopen.novel.resource.controller;
 
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.resource.dto.req.ImgVerifyCodeReqDto;
 import io.github.xxyopen.novel.resource.dto.resp.ImgVerifyCodeRespDto;
+import io.github.xxyopen.novel.resource.dto.resp.SmsVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.service.ResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,6 +39,17 @@ public class ResourceController {
     }
 
     /**
+     * 验证图片验证码接口
+     */
+    @Operation(summary = "验证图片验证码接口")
+    @PostMapping("img_verify_code/verify")
+    public RestResp<Void> verifyImgCode(
+            @RequestBody ImgVerifyCodeReqDto dto) {
+        return resourceService.verifyImgCode(dto);
+    }
+
+
+    /**
      * 图片上传接口
      */
     @Operation(summary = "图片上传接口")
@@ -44,6 +57,15 @@ public class ResourceController {
     RestResp<String> uploadImage(
         @Parameter(description = "上传文件") @RequestParam("file") MultipartFile file) {
         return resourceService.uploadImage(file);
+    }
+
+    /**
+     * 获取手机验证码接口
+     */
+    @Operation(summary = "发送短信验证码接口")
+    @GetMapping("/sms_verify_code")
+    public RestResp<SmsVerifyCodeRespDto> sendSmsCode(@RequestParam String phone) {
+        return resourceService.sendSmsCode(phone);
     }
 
 }
