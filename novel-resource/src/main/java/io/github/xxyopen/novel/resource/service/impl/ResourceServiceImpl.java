@@ -1,11 +1,11 @@
 package io.github.xxyopen.novel.resource.service.impl;
-
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.xxyopen.novel.common.constant.CacheConsts;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.common.constant.SystemConfigConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.config.exception.BusinessException;
+import io.github.xxyopen.novel.resource.dto.req.ImgVerifyCodeReqDto;
 import io.github.xxyopen.novel.resource.dto.resp.SmsVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.dto.resp.ImgVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.manager.redis.VerifyCodeManager;
@@ -86,7 +86,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public RestResp<SmsVerifyCodeRespDto> sendSmsCode(String phone) throws Exception {
+    public RestResp<SmsVerifyCodeRespDto> sendSmsCode(String phone) {
         String sessionId = IdWorker.get32UUID();
 
         // 生成6位验证码
@@ -101,6 +101,20 @@ public class ResourceServiceImpl implements ResourceService {
         return RestResp.ok(SmsVerifyCodeRespDto.builder()
                 .sessionId(sessionId)
                 .build());
+    }
+
+    @Override
+    public RestResp<Void> verifyImgCode(ImgVerifyCodeReqDto dto) {
+        // 校验图形验证码
+        if (!verifyCodeManager.imgVerifyCodeOk(dto.getSessionId(), dto.getCode())) {
+            throw new BusinessException(ErrorCodeEnum.USER_VERIFY_CODE_ERROR);
+        }
+
+        // 验证成功后删除 Redis 中的验证码
+        verifyCodeManager.removeImgVerifyCode(dto.getSessionId());
+
+        // 返回成功响应
+        return RestResp.ok();
     }
 
     private void sendSms(String phone, String code) {

@@ -2,6 +2,7 @@ package io.github.xxyopen.novel.resource.controller;
 
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.resource.dto.req.ImgVerifyCodeReqDto;
 import io.github.xxyopen.novel.resource.dto.resp.ImgVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.dto.resp.SmsVerifyCodeRespDto;
 import io.github.xxyopen.novel.resource.service.ResourceService;
@@ -36,6 +37,17 @@ public class ResourceController {
     public RestResp<ImgVerifyCodeRespDto> getImgVerifyCode() throws IOException {
         return resourceService.getImgVerifyCode();
     }
+
+    /**
+     * 验证图片验证码接口
+     */
+    @Operation(summary = "验证图片验证码接口")
+    @PostMapping("img_verify_code/verify")
+    public RestResp<Void> verifyImgCode(
+            @RequestBody ImgVerifyCodeReqDto dto) {
+        return resourceService.verifyImgCode(dto);
+    }
+
 
     /**
      * 图片上传接口
