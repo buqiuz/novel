@@ -13,9 +13,11 @@ import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
 import io.github.xxyopen.novel.ai.service.AiService;
+import io.github.xxyopen.novel.common.constant.CacheConsts;
 import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -97,6 +99,11 @@ public class AiServiceImpl implements AiService {
             return "内部错误，请联系技术支持。";
         }
     }
+    @Cacheable(
+            cacheManager = CacheConsts.REDIS_CACHE_MANAGER,
+            value = CacheConsts.TTS_AUDIO_CACHE_NAME,
+            key = "#root.methodName + ':' + T(org.springframework.util.DigestUtils).md5DigestAsHex(#text.getBytes()) + ':' + #voiceType"
+    )
     @Override
     public String textToSpeech_qwen_tts(String text, String voiceType) {
         try {
@@ -104,22 +111,12 @@ public class AiServiceImpl implements AiService {
             // 构建语音合成参数
             MultiModalConversationParam param = MultiModalConversationParam.builder()
                     .model(model_qwen_tts)
-                    .apiKey("sk-232a5143cc26411cb706e4760a64f9d5")
+                    .apiKey(dashScopeApiKey)
                     .text(text)
                     .voice(AudioParameters.Voice.valueOf(voiceType))
                     .build();
             // 调用API进行语音合成
             MultiModalConversationResult result = conv.call(param);
-//            // 下载音频文件到本地
-//            try (InputStream in = new URL(audioUrl).openStream();
-//                 FileOutputStream out = new FileOutputStream("logs/tts_output.wav")) {
-//                byte[] buffer = new byte[1024];
-//                int bytesRead;
-//                while ((bytesRead = in.read(buffer)) != -1) {
-//                    out.write(buffer, 0, bytesRead);
-//                }
-//                System.out.println("\n音频文件已下载到本地: downloaded_audio.wav");
-//            }
             System.out.println("\n音频合成成功，音频文件URL: " + result.getOutput().getAudio().getUrl());
             return result.getOutput().getAudio().getUrl();
         } catch (ApiException | NoApiKeyException | UploadFileException e) {
@@ -130,6 +127,7 @@ public class AiServiceImpl implements AiService {
             return null;
         }
     }
+
 
     //语音合成
     @Override

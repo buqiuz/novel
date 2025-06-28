@@ -96,6 +96,10 @@ public class CacheConsts {
     public static final String AUTHOR_INFO_CACHE_NAME = "authorInfoCache";
 
     /**
+     * TTS 音频缓存
+     */
+    public static final String TTS_AUDIO_CACHE_NAME = "ttsAudioCache";
+    /**
      * 缓存配置常量
      */
     public enum CacheEnum {
@@ -124,7 +128,9 @@ public class CacheConsts {
 
         USER_INFO_CACHE(2, USER_INFO_CACHE_NAME, 60 * 60 * 24, 10000),
 
-        AUTHOR_INFO_CACHE(2, AUTHOR_INFO_CACHE_NAME, 60 * 60 * 48, 1000);
+        AUTHOR_INFO_CACHE(2, AUTHOR_INFO_CACHE_NAME, 60 * 60 * 48, 1000),
+
+        TTS_AUDIO_CACHE(2, TTS_AUDIO_CACHE_NAME, 60 * 60 * 24, 1000);
 
         /**
          * 缓存类型 0-本地 1-本地和远程 2-远程
