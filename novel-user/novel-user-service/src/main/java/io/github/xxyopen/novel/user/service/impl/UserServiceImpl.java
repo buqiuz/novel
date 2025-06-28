@@ -172,4 +172,16 @@ public class UserServiceImpl implements UserService {
                 .userPhoto(v.getUserPhoto())
                 .build()).collect(Collectors.toList()));
     }
+
+    @Override
+    public RestResp<Void> delete(Long userId) {
+        int result = userInfoMapper.deleteById(userId);
+
+        if (result > 0) {
+            return RestResp.ok(); // 删除成功
+        } else {
+            throw new BusinessException(ErrorCodeEnum.USER_DELETE_ERROR);
+        }
+    }
+
 }

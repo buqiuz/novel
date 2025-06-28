@@ -59,6 +59,11 @@ public class FrontUserController {
     /**
      * 用户删除接口
      */
+    @Operation(summary = "用户删除接口")
+    @DeleteMapping("delete")
+    public RestResp<Void> delete() {
+        return userService.delete(UserHolder.getUserId());
+    }
 
 
     /**
