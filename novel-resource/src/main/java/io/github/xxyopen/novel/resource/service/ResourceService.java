@@ -2,6 +2,7 @@ package io.github.xxyopen.novel.resource.service;
 
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.resource.dto.resp.ImgVerifyCodeRespDto;
+import io.github.xxyopen.novel.resource.dto.resp.SmsVerifyCodeRespDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -28,4 +29,6 @@ public interface ResourceService {
      * @return 图片访问路径
      * */
     RestResp<String> uploadImage(MultipartFile file);
+
+    RestResp<SmsVerifyCodeRespDto> sendSmsCode(String phone) throws Exception;
 }

@@ -141,7 +141,12 @@ public enum ErrorCodeEnum {
     /**
      * 书章节不存在
      */
-    BOOK_CHAPTER_NOT_EXIST("A3003", "书章节不存在");
+    BOOK_CHAPTER_NOT_EXIST("A3003", "书章节不存在"),
+
+    /**
+     * 用户发送短信验证码异常
+     */
+    USER_SEND_SMS_ERROR("A3004","用户发送短信验证码失败" );
 
     /**
      * 错误码

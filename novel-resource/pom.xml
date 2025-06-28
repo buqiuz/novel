@@ -18,6 +18,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.github.xxyopen</groupId>
+            <artifactId>novel-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
