@@ -22,18 +22,19 @@ public class VerifyCodeManager {
     private final StringRedisTemplate stringRedisTemplate;
 
     /**
-     * 校验图形验证码
+     * 校验手机验证码
      */
-    public boolean imgVerifyCodeOk(String sessionId, String verifyCode) {
+    public boolean smsVerifyCodeOk(String sessionId, String verifyCode) {
         return Objects.equals(stringRedisTemplate.opsForValue()
-            .get(CacheConsts.IMG_VERIFY_CODE_CACHE_KEY + sessionId), verifyCode);
+                .get(CacheConsts.SMS_VERIFY_CODE_CACHE_KEY + sessionId), verifyCode);
     }
 
     /**
-     * 从 Redis 中删除验证码
+     * 从 Redis 中删除手机验证码
      */
-    public void removeImgVerifyCode(String sessionId) {
-        stringRedisTemplate.delete(CacheConsts.IMG_VERIFY_CODE_CACHE_KEY + sessionId);
+    public void removeSmsVerifyCode(String sessionId) {
+        stringRedisTemplate.delete(CacheConsts.SMS_VERIFY_CODE_CACHE_KEY + sessionId);
     }
+
 
 }

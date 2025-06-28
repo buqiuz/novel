@@ -24,10 +24,10 @@ public class UserRegisterReqDto {
     @NotBlank(message="密码不能为空！")
     private String password;
 
-    @Schema(description = "验证码", required = true)
-    @NotBlank(message="验证码不能为空！")
-    @Pattern(regexp="^\\d{4}$",message="验证码格式不正确！")
-    private String velCode;
+    @Schema(description = "手机验证码", required = true)
+    @NotBlank(message = "手机验证码不能为空！")
+    @Pattern(regexp = "^\\d{6}$", message = "手机验证码格式不正确！")
+    private String smsCode;
 
     /**
      * 请求会话标识，用来标识图形验证码属于哪个会话
