@@ -1,23 +1,15 @@
 package io.github.xxyopen.novel.ai.controller.front;
 
-import com.alibaba.dashscope.aigc.multimodalconversation.AudioParameters;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
+import io.github.xxyopen.novel.ai.dto.req.TtsRequestBody;
 import io.github.xxyopen.novel.ai.service.AiService;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
-import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import reactor.core.publisher.Flux;
+
 
 
 /**
@@ -63,16 +55,13 @@ public class FrontAiController {
 //    public Flux<String> streamTextToSpeech(@RequestParam String text, @RequestParam String voiceType) {
 //        return aiService.textToSpeech_qwen_tts_Flux(text, voiceType);
 //    }
+
     /**
-     * 使用 Qwen TTS 合成语音 并以流式方式返回
+     * 使用 Qwen TTS 合成语音 并以流式方式返回 (POST 版本)
      */
-    @CrossOrigin( origins = "*")
-    @GetMapping(value = "/tts/qwen/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter streamTts(
-            @RequestParam String text,
-            @RequestParam(defaultValue = "CHERRY") String voiceType
-    ) {
-        return aiService.textToSpeechQwenStream(text, voiceType);
+    @PostMapping(value = "/tts/qwen/stream-post", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamTtsPost(@RequestBody TtsRequestBody requestBody) {
+        return aiService.textToSpeechQwenStream(requestBody.getText(), requestBody.getVoiceType());
     }
 
 }

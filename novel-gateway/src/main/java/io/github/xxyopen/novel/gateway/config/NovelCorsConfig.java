@@ -19,8 +19,11 @@ public class NovelCorsConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        // 允许的域,不要写*，否则cookie就无法使用了
+        // 允许的域名（本地 + 公网）
         config.addAllowedOrigin("http://localhost:20000");
+        config.addAllowedOrigin("http://buqiu.icu");
+        config.addAllowedOrigin("https://buqiu.icu");
+
         // 允许的头信息
         config.addAllowedHeader("*");
         // 允许的请求方式
@@ -29,7 +32,6 @@ public class NovelCorsConfig {
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
-        // 添加映射路径，拦截一切请求
         configurationSource.registerCorsConfiguration("/**", config);
         return new CorsWebFilter(configurationSource);
     }
