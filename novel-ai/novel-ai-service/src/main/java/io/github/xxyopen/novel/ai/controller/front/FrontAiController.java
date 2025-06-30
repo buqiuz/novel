@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Map;
 
 
 /**
@@ -63,5 +64,29 @@ public class FrontAiController {
     public SseEmitter streamTtsPost(@RequestBody TtsRequestBody requestBody) {
         return aiService.textToSpeechQwenStream(requestBody.getText(), requestBody.getVoiceType());
     }
+
+    /**
+     * 文生图
+     */
+
+    @PostMapping("/textToImage")
+    public RestResp<String> textToImage(@RequestBody Map<String, String> request) {
+
+        System.out.println("接收到的请求体: " + request);
+        String prompt = request.get("text");
+
+
+        return RestResp.ok(aiService.textToImage(prompt));
+    }
+
+    @PostMapping("/pngToJpg")
+    public RestResp<String> pngToJpg(@RequestBody Map<String, String> request) {
+        System.out.println("接收到的url: " + request);
+        String url = request.get("url");
+        return RestResp.ok(aiService.pngToJpg(url));
+
+    }
+
+
 
 }

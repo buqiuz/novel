@@ -12,6 +12,7 @@ import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesisParam;
 import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.xxyopen.novel.ai.service.AiService;
 import io.github.xxyopen.novel.common.constant.CacheConsts;
 import io.reactivex.Flowable;
@@ -20,14 +21,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.lang.System;
 import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.alibaba.dashscope.aigc.generation.Generation;
@@ -38,6 +43,8 @@ import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.ApiException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
+
+import javax.imageio.ImageIO;
 
 @Slf4j
 @Service
@@ -198,11 +205,61 @@ public class AiServiceImpl implements AiService {
                     .build();
             ImageSynthesis imageSynthesis = new ImageSynthesis();
             ImageSynthesisResult result = imageSynthesis.call(param);
-            return result.toString();
+            // 使用ObjectMapper转换为Map
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> resultMap = mapper.convertValue(result.getOutput().getResults().get(0), Map.class);
+            return (String) resultMap.get("url");
         } catch (Exception e) {
             System.out.println("文本生成图片时出错: " + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public String pngToJpg(String url) {
+        try {
+            return saveAsJpgToImageDir(url);
+        } catch (Exception e) {
+            System.out.println("文本生成图片时出错: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    private String saveAsJpgToImageDir(String pngUrl) throws IOException {
+        // 确保image目录存在
+        File imageDir = new File("image");
+        if (!imageDir.exists()) {
+            imageDir.mkdirs();
+        }
+        // 1. 下载PNG图片
+        URL url = new URL(pngUrl);
+        BufferedImage pngImage = ImageIO.read(url);
+
+        if (pngImage == null) {
+            throw new IOException("下载图片失败");
+        }
+
+        // 2. 创建JPG格式的BufferedImage
+        BufferedImage jpgImage = new BufferedImage(
+                pngImage.getWidth(),
+                pngImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB
+        );
+
+        // 3. 绘制并转换格式
+        jpgImage.createGraphics().drawImage(pngImage, 0, 0, Color.WHITE, null);
+
+        // 4. 生成唯一文件名
+        String fileName = "cover_" + System.currentTimeMillis() + ".jpg";
+        File outputFile = new File(imageDir, fileName);
+
+        // 5. 保存为JPG
+        if (!ImageIO.write(jpgImage, "jpg", outputFile)) {
+            throw new IOException("无法保存为JPG格式");
+        }
+        // 6. 返回相对路径（前端拼接基础URL）
+        return "/image/" + fileName;
     }
 
 
