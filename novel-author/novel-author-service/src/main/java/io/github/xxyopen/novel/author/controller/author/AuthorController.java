@@ -124,6 +124,16 @@ public class AuthorController {
     }
 
     /**
+     * 小说删除接口
+     */
+    @Operation(summary = "小说删除接口")
+    @DeleteMapping("book/{bookId}")
+    public RestResp<Void> deleteBook(
+        @Parameter(description = "小说ID") @PathVariable("bookId") Long bookId) {
+        return bookFeignManager.deleteBook(bookId);
+    }
+
+    /**
      * 获取小说章节详情接口
      */
     @Operation(summary = "获取小说章节详情接口")

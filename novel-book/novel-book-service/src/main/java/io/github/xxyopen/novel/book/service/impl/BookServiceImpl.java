@@ -606,5 +606,47 @@ public class BookServiceImpl implements BookService {
         return RestResp.ok();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public RestResp<Void> deleteBook(Long bookId) {
+        // 1. 查询小说是否存在
+        BookInfo bookInfo = bookInfoMapper.selectById(bookId);
+        if (bookInfo == null) {
+            return RestResp.fail(ErrorCodeEnum.BOOK_NOT_EXIST);
+        }
+
+        // 2. 删除小说内容和章节
+        // 2.1 查询所有章节ID
+        QueryWrapper<BookChapter> chapterQueryWrapper = new QueryWrapper<>();
+        chapterQueryWrapper.eq(DatabaseConsts.BookChapterTable.COLUMN_BOOK_ID, bookId);
+        List<BookChapter> bookChapters = bookChapterMapper.selectList(chapterQueryWrapper);
+        List<Long> chapterIds = bookChapters.stream().map(BookChapter::getId).toList();
+
+        // 2.2 删除章节内容
+        if (!chapterIds.isEmpty()) {
+            QueryWrapper<BookContent> contentQueryWrapper = new QueryWrapper<>();
+            contentQueryWrapper.in(DatabaseConsts.BookContentTable.COLUMN_CHAPTER_ID, chapterIds);
+            bookContentMapper.delete(contentQueryWrapper);
+        }
+
+        // 2.3 删除所有章节
+        bookChapterMapper.delete(chapterQueryWrapper);
+
+        // 3. 删除小说评论
+        QueryWrapper<BookComment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.eq(DatabaseConsts.BookCommentTable.COLUMN_BOOK_ID, bookId);
+        bookCommentMapper.delete(commentQueryWrapper);
+
+        // 4. 删除小说信息
+        bookInfoMapper.deleteById(bookId);
+
+        // 5. 清除相关缓存
+        bookInfoCacheManager.evictBookInfoCache(bookId);
+
+        // 6. 发送MQ消息，通知其他服务小说已被删除
+        amqpMsgManager.sendBookChangeMsg(bookId);
+
+        return RestResp.ok();
+    }
 
 }

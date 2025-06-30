@@ -137,4 +137,13 @@ public class InnerBookController {
         return bookService.updateBookChapter(dto);
     }
 
+    /**
+     * 删除小说
+     */
+    @Operation(summary = "删除小说")
+    @DeleteMapping("deleteBook")
+    public RestResp<Void> deleteBook(@Parameter(description = "小说ID") @RequestBody Long bookId) {
+        return bookService.deleteBook(bookId);
+    }
+
 }

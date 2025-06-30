@@ -98,6 +98,12 @@ public interface BookFeign {
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/updateBookChapter")
     RestResp<Void> updateBookChapter(@RequestBody ChapterUpdateReqDto dto);
 
+    /**
+     * 删除小说
+     */
+    @DeleteMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/deleteBook")
+    RestResp<Void> deleteBook(Long bookId);
+
 
     @Component
     class BookFeignFallback implements BookFeign {
@@ -165,6 +171,11 @@ public interface BookFeign {
 
         @Override
         public RestResp<Void> updateBookChapter(ChapterUpdateReqDto dto) {
+            return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
+        }
+
+        @Override
+        public RestResp<Void> deleteBook(Long bookId) {
             return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
         }
 

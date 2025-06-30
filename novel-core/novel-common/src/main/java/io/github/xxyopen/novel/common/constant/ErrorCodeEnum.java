@@ -60,6 +60,11 @@ public enum ErrorCodeEnum {
     USER_ACCOUNT_NOT_EXIST("A0201", "用户账号不存在"),
 
     /**
+     * 小说不存在
+     */
+    BOOK_NOT_EXIST("A0202", "小说不存在"),
+
+    /**
      * 用户密码错误
      */
     USER_PASSWORD_ERROR("A0210", "用户密码错误"),
