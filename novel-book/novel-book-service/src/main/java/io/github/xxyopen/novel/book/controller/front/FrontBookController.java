@@ -153,4 +153,25 @@ public class FrontBookController {
         return bookService.listNewestComments(bookId);
     }
 
+    /**
+     * 小说章节解锁接口
+     */
+    @Operation(summary = "小说章节解锁接口")
+    @PostMapping("chapter/unlock")
+    public RestResp<Boolean> insertBookChapterUnlock(
+            @Parameter(description = "用户ID") Long userId,
+            @Parameter(description = "章节ID") Long chapterId ) {
+        return bookService.insertBookChapterUnlock(userId, chapterId);
+    }
+
+    /**
+     * 小说章节解锁信息查询接口
+     */
+    @Operation(summary = "小说章节解锁信息查询接口")
+    @GetMapping("chapter/unlockInfo")
+    public RestResp<Boolean> getBookChapterUnlock(
+            @Parameter(description = "用户ID") Long userId,
+            @Parameter(description = "章节ID") Long chapterId ) {
+        return bookService.getBookChapterUnlock(userId, chapterId);
+    }
 }

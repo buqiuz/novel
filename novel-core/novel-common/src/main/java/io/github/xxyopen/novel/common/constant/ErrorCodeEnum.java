@@ -156,7 +156,29 @@ public enum ErrorCodeEnum {
     /**
      * 用户发送短信验证码异常
      */
-    USER_SEND_SMS_ERROR("A3004","用户发送短信验证码失败" );
+    USER_SEND_SMS_ERROR("A3004","用户发送短信验证码失败" ),
+
+    /**
+     * 用户章节解锁记录已存在
+     */
+    USER_CHAPTER_UNLOCK_EXIST("A3005", "用户章节解锁已存在"),
+    /**
+     * 用户章节解锁记录插入失败
+     */
+    USER_CHAPTER_UNLOCK_INSERT_ERROR("A3006", "用户章节解锁插入失败"),
+
+    /**
+     * 用户章节解锁记录查询失败
+     */
+    USER_CHAPTER_UNLOCK_NOT_EXIST("A3007", "用户章节解锁记录查询失败"),
+    /**
+     * 用户金币不足
+     */
+    USER_GOLD_NOT_ENOUGH("A3008", "用户金币不足"),
+    /**
+     * 用户金币更新失败
+     */
+    USER_GOLD_UPDATE_ERROR("A3009", "用户金币更新失败");
 
     /**
      * 错误码

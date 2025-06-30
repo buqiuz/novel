@@ -1,6 +1,9 @@
 package io.github.xxyopen.novel.payment.service.impl;
 
 import com.alipay.easysdk.kernel.util.ResponseChecker;
+import io.github.xxyopen.novel.book.dto.req.ChapterUnlockReqDto;
+import io.github.xxyopen.novel.book.feign.BookFeign;
+import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.payment.dao.entity.UserWallet;
 import io.github.xxyopen.novel.payment.dao.mapper.UserWalletMapper;
 import io.github.xxyopen.novel.payment.service.PaymentService;
@@ -21,12 +24,15 @@ import com.alipay.easysdk.kernel.Config;
 import com.alipay.easysdk.payment.page.models.AlipayTradePagePayResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+import io.github.xxyopen.novel.common.resp.RestResp;
 
 @Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private UserWalletMapper userWalletMapper;
+    @Autowired
+    private BookFeign bookFeign;
     @Value("${alipay.app-id}")
     private String appId;
     @Value("${alipay.private-key}")
@@ -116,6 +122,36 @@ public class PaymentServiceImpl implements PaymentService {
             return wallet.getGoldBalance();
         } catch (Exception e) {
             System.out.println("查询用户金币余额异常，原因："+e.getMessage());
+            throw new RuntimeException(e.getMessage(),e);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public RestResp <Integer>  useGold(Long userId,Long chapterId, Long goldCoins) {
+        try{
+            UserWallet wallet = userWalletMapper.selectById(userId);
+            Long goldBalance =wallet.getGoldBalance();
+            if(goldBalance < goldCoins){
+                return RestResp.ok(0);
+            }
+            else{
+                wallet.setGoldBalance(goldBalance - goldCoins);
+                wallet.setUpdatedTime(LocalDateTime.now());
+                int rows = userWalletMapper.updateById(wallet);
+                if(rows > 0){
+                    ChapterUnlockReqDto dto = new ChapterUnlockReqDto();
+                    dto.setUserId(userId);
+                    dto.setChapterId(chapterId);
+                    RestResp<Boolean> resp = bookFeign.insertBookChapterUnlock(dto);
+                    if(resp.getData()){
+                        return RestResp.ok(1);
+                    }
+                }
+                return RestResp.ok(rows);
+            }
+        } catch (Exception e) {
+            System.out.println("使用书币异常，原因："+e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
         }
     }

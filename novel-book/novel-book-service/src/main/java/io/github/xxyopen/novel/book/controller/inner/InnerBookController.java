@@ -146,4 +146,12 @@ public class InnerBookController {
         return bookService.deleteBook(bookId);
     }
 
+    /**
+     * 解锁章节
+     */
+    @Operation(summary = "解锁章节")
+    @PostMapping("insertBookChapterUnlock")
+    public RestResp<Boolean> insertBookChapterUnlock(@RequestBody ChapterUnlockReqDto dto){
+        return bookService.insertBookChapterUnlock(dto.getUserId(),dto.getChapterId());
+    }
 }

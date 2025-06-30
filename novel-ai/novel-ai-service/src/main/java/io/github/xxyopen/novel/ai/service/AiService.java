@@ -19,6 +19,7 @@ public interface AiService {
 
     //图片生成
     String textToImage(String text);
+    String pngToJpg(String url);
 
     SseEmitter textToSpeechQwenStream(String text,String voiceType);
 }

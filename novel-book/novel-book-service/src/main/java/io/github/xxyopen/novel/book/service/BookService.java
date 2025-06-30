@@ -215,4 +215,20 @@ public interface BookService {
      * @return 操作结果
      */
     RestResp<Void> deleteBook(Long bookId);
+
+    /**
+     * 插入小说章节解锁信息
+     * @param userId 用户ID
+     * @param chapterId 章节ID
+     * @return 操作结果
+     */
+    RestResp<Boolean> insertBookChapterUnlock(Long userId, Long chapterId);
+
+    /**
+     * 获取小说章节解锁信息
+     * @param userId 用户ID
+     * @param chapterId 章节ID
+     * @return 操作结果
+     */
+    RestResp<Boolean> getBookChapterUnlock(Long userId, Long chapterId);
 }

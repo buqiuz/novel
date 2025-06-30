@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Map;
 
 
 /**
@@ -27,6 +28,28 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class FrontAiController {
 
     private final AiService aiService;
+
+    /**
+     * 文生图
+     */
+
+    @PostMapping("/textToImage")
+    public RestResp<String> textToImage(@RequestBody Map<String, String> request) {
+
+        System.out.println("接收到的请求体: " + request);
+        String prompt = request.get("text");
+
+
+        return RestResp.ok(aiService.textToImage(prompt));
+    }
+
+    @PostMapping("/pngToJpg")
+    public RestResp<String> pngToJpg(@RequestBody Map<String, String> request) {
+        System.out.println("接收到的url: " + request);
+        String url = request.get("url");
+        return RestResp.ok(aiService.pngToJpg(url));
+
+    }
 
     /**
      * 使用 Qwen TTS 合成语音

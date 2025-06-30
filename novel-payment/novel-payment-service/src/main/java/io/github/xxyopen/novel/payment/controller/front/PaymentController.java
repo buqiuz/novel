@@ -58,4 +58,15 @@ public class PaymentController {
             @RequestParam("userId") Long userId ){
         return RestResp.ok(paymentService.getGoldBalance(userId));
     }
+
+    /**
+     * 用户使用金币
+     */
+    @PostMapping("/useCoins")
+    public RestResp<Integer> useCoins(
+            @RequestParam("userId") Long userId,
+            @RequestParam("chapterId") Long chapterId,
+            @RequestParam("goldCoins") Long goldCoins ) {
+        return paymentService.useGold(userId,chapterId,goldCoins);
+    }
 }
