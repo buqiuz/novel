@@ -11,9 +11,11 @@ import io.github.xxyopen.novel.config.exception.BusinessException;
 import io.github.xxyopen.novel.user.dao.entity.UserBookshelf;
 import io.github.xxyopen.novel.user.dao.entity.UserFeedback;
 import io.github.xxyopen.novel.user.dao.entity.UserInfo;
+import io.github.xxyopen.novel.user.dao.entity.UserWallet;
 import io.github.xxyopen.novel.user.dao.mapper.UserBookshelfMapper;
 import io.github.xxyopen.novel.user.dao.mapper.UserFeedbackMapper;
 import io.github.xxyopen.novel.user.dao.mapper.UserInfoMapper;
+import io.github.xxyopen.novel.user.dao.mapper.UserWalletMapper;
 import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
@@ -50,6 +52,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserBookshelfMapper userBookshelfMapper;
 
+    private final UserWalletMapper userWalletMapper;
+
     @Override
     public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
 
@@ -68,6 +72,14 @@ public class UserServiceImpl implements UserService {
         userInfo.setUpdateTime(LocalDateTime.now());
         userInfo.setSalt("0");
         userInfoMapper.insert(userInfo);
+
+        //初始化用户钱包
+        UserWallet userWallet = new UserWallet();
+        userWallet.setUserId(userInfo.getId());
+        userWallet.setGoldBalance(0L); // 初始金币余额设为0
+        userWallet.setCreatedTime(LocalDateTime.now());
+        userWallet.setUpdatedTime(LocalDateTime.now());
+        userWalletMapper.insert(userWallet);
 
         // 删除验证码
         verifyCodeManager.removeSmsVerifyCode(dto.getSessionId());
