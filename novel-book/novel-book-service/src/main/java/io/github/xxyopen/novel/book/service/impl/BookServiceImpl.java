@@ -708,6 +708,13 @@ public class BookServiceImpl implements BookService {
     @Override
     public RestResp<Boolean> getBookChapterUnlock(Long userId,Long chapterId){
         try{
+            BookChapter chapter = bookChapterMapper.selectById(chapterId);
+            if (chapter == null) {
+                return RestResp.ok( false);
+            }
+            if(chapter.getIsVip() == 0){
+                return RestResp.ok(true);
+            }
             QueryWrapper<ChapterUnlock> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("user_id", userId).eq("chapter_id", chapterId);
             return RestResp.ok(chapterUnlockMapper.selectOne(queryWrapper) != null);
