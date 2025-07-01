@@ -4,14 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.xxyopen.novel.book.dao.entity.BookChapter;
-import io.github.xxyopen.novel.book.dao.entity.BookComment;
-import io.github.xxyopen.novel.book.dao.entity.BookContent;
-import io.github.xxyopen.novel.book.dao.entity.BookInfo;
-import io.github.xxyopen.novel.book.dao.mapper.BookChapterMapper;
-import io.github.xxyopen.novel.book.dao.mapper.BookCommentMapper;
-import io.github.xxyopen.novel.book.dao.mapper.BookContentMapper;
-import io.github.xxyopen.novel.book.dao.mapper.BookInfoMapper;
+import io.github.xxyopen.novel.book.dao.entity.*;
+import io.github.xxyopen.novel.book.dao.mapper.*;
 import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.*;
 import io.github.xxyopen.novel.book.manager.cache.*;
@@ -71,6 +65,8 @@ public class BookServiceImpl implements BookService {
     private final AmqpMsgManager amqpMsgManager;
 
     private final UserFeignManager userFeignManager;
+
+    private final ChapterUnlockMapper chapterUnlockMapper;
 
     private static final Integer REC_BOOK_COUNT = 4;
 
@@ -695,5 +691,28 @@ public class BookServiceImpl implements BookService {
 
         return RestResp.ok();
     }
-
+    @Override
+    public RestResp<Boolean> insertBookChapterUnlock(Long userId,Long chapterId){
+        try{
+            ChapterUnlock unlock = new ChapterUnlock();
+            unlock.setUserId(userId);
+            unlock.setChapterId(chapterId);
+            unlock.setUnlockedAt(LocalDateTime.now());
+            unlock.setSpentTokens(50L);
+            int result = chapterUnlockMapper.insert(unlock);
+            return RestResp.ok(result > 0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Override
+    public RestResp<Boolean> getBookChapterUnlock(Long userId,Long chapterId){
+        try{
+            QueryWrapper<ChapterUnlock> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId).eq("chapter_id", chapterId);
+            return RestResp.ok(chapterUnlockMapper.selectOne(queryWrapper) != null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

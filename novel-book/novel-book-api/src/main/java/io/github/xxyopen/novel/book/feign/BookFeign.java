@@ -110,6 +110,13 @@ public interface BookFeign {
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/updateBook")
     RestResp<Void> updateBook(@RequestBody BookUpdateReqDto dto);
 
+    /**
+     * 章节解锁接口
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/insertBookChapterUnlock")
+    RestResp<Boolean> insertBookChapterUnlock(@RequestBody ChapterUnlockReqDto dto);
+
+
 
     @Component
     class BookFeignFallback implements BookFeign {
@@ -190,7 +197,10 @@ public interface BookFeign {
             return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
         }
 
-
+        @Override
+        public RestResp<Boolean> insertBookChapterUnlock(ChapterUnlockReqDto dto) {
+            return RestResp.ok( false);
+        }
     }
 
 }
