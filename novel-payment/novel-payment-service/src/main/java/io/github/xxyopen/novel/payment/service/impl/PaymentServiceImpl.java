@@ -43,6 +43,9 @@ public class PaymentServiceImpl implements PaymentService {
     private String gatewayurl;
     @Value("${alipay.return-url}")
     private String returnUrl;
+    @Value("${novel.front.home-url}")
+    private String home_url;
+
     @Value("${coin.exchange-rate}")
     private Integer exchangeRate;
     private Config getOptions() {

@@ -208,4 +208,16 @@ public class AuthorController {
         return bookFeignManager.listPublishBookChapters(chapterPageReqReqDto);
     }
 
+    /**
+     * 小说信息更新接口
+     */
+    @Operation(summary = "小说信息更新接口")
+    @PutMapping("book/{bookId}")
+    public RestResp<Void> updateBook(
+        @Parameter(description = "小说ID") @PathVariable("bookId") Long bookId,
+        @Valid @RequestBody BookUpdateReqDto dto) {
+        dto.setId(bookId); // 设置小说ID
+        return bookFeignManager.updateBook(dto);
+    }
+
 }

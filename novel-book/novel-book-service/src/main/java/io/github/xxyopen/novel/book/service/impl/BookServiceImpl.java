@@ -4,8 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.xxyopen.novel.book.dao.entity.*;
-import io.github.xxyopen.novel.book.dao.mapper.*;
+import io.github.xxyopen.novel.book.dao.entity.BookChapter;
+import io.github.xxyopen.novel.book.dao.entity.BookComment;
+import io.github.xxyopen.novel.book.dao.entity.BookContent;
+import io.github.xxyopen.novel.book.dao.entity.BookInfo;
+import io.github.xxyopen.novel.book.dao.mapper.BookChapterMapper;
+import io.github.xxyopen.novel.book.dao.mapper.BookCommentMapper;
+import io.github.xxyopen.novel.book.dao.mapper.BookContentMapper;
+import io.github.xxyopen.novel.book.dao.mapper.BookInfoMapper;
 import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.*;
 import io.github.xxyopen.novel.book.manager.cache.*;
@@ -65,8 +71,6 @@ public class BookServiceImpl implements BookService {
     private final AmqpMsgManager amqpMsgManager;
 
     private final UserFeignManager userFeignManager;
-
-    private final ChapterUnlockMapper chapterUnlockMapper;
 
     private static final Integer REC_BOOK_COUNT = 4;
 
@@ -645,30 +649,51 @@ public class BookServiceImpl implements BookService {
         return RestResp.ok();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public RestResp<Boolean> insertBookChapterUnlock(Long userId, Long chapterId){
-        ChapterUnlock chapterUnlock = new ChapterUnlock();
-        chapterUnlock.setUserId(userId);
-        chapterUnlock.setChapterId(chapterId);
-        chapterUnlock.setUnlockedAt(LocalDateTime.now());
-        chapterUnlock.setSpentTokens(50L);
-        QueryWrapper<ChapterUnlock> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId).eq("chapter_id", chapterId);
-        Long count = chapterUnlockMapper.selectCount(queryWrapper);
-        if(count > 0){
-            return RestResp.ok(Boolean.FALSE);
+    public RestResp<Void> updateBook(BookUpdateReqDto dto) {
+        // 1. 查询小说是否存在
+        BookInfo bookInfo = bookInfoMapper.selectById(dto.getId());
+        if (bookInfo == null) {
+            return RestResp.fail(ErrorCodeEnum.BOOK_NOT_EXIST);
         }
-        else{
-            int rowsAffected = chapterUnlockMapper.insert(chapterUnlock);
-            return rowsAffected > 0 ? RestResp.ok(Boolean.TRUE): RestResp.ok(Boolean.FALSE);
+
+        // 2. 校验作者是否有权限更新小说
+        if (!Objects.equals(bookInfo.getAuthorId(), dto.getAuthorId())) {
+            return RestResp.fail(ErrorCodeEnum.USER_UN_AUTH);
         }
+
+        // 3. 如果小说名修改，检查新名称是否已存在
+        if (!Objects.equals(bookInfo.getBookName(), dto.getBookName())) {
+            QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(DatabaseConsts.BookTable.COLUMN_BOOK_NAME, dto.getBookName())
+                    .ne(DatabaseConsts.CommonColumnEnum.ID.getName(), dto.getId());
+            if (bookInfoMapper.selectCount(queryWrapper) > 0) {
+                return RestResp.fail(ErrorCodeEnum.AUTHOR_BOOK_NAME_EXIST);
+            }
+        }
+
+        // 4. 更新小说信息
+        BookInfo updateBookInfo = new BookInfo();
+        updateBookInfo.setId(dto.getId());
+        updateBookInfo.setWorkDirection(dto.getWorkDirection());
+        updateBookInfo.setCategoryId(dto.getCategoryId());
+        updateBookInfo.setCategoryName(dto.getCategoryName());
+        updateBookInfo.setPicUrl(dto.getPicUrl());
+        updateBookInfo.setBookName(dto.getBookName());
+        updateBookInfo.setBookDesc(dto.getBookDesc());
+        updateBookInfo.setBookStatus(dto.getBookStatus());
+        updateBookInfo.setIsVip(dto.getIsVip());
+        updateBookInfo.setUpdateTime(LocalDateTime.now());
+        bookInfoMapper.updateById(updateBookInfo);
+
+        // 5. 清除缓存
+        bookInfoCacheManager.evictBookInfoCache(dto.getId());
+
+        // 6. 发送MQ消息，通知其他服务小说已更新
+        amqpMsgManager.sendBookChangeMsg(dto.getId());
+
+        return RestResp.ok();
     }
 
-    @Override
-    public RestResp<Boolean> getBookChapterUnlock(Long userId, Long chapterId){
-        QueryWrapper<ChapterUnlock> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId).eq("chapter_id", chapterId);
-        Long count = chapterUnlockMapper.selectCount(queryWrapper);
-        return count > 0 ? RestResp.ok(Boolean.TRUE) : RestResp.ok(Boolean.FALSE);
-    }
 }

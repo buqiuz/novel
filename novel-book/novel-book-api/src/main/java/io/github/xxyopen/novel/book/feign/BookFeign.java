@@ -105,10 +105,10 @@ public interface BookFeign {
     RestResp<Void> deleteBook(Long bookId);
 
     /**
-     * 解锁章节
+     * 小说更新接口
      */
-    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/insertBookChapterUnlock")
-    RestResp<Boolean> insertBookChapterUnlock(@RequestBody ChapterUnlockReqDto dto);
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/updateBook")
+    RestResp<Void> updateBook(@RequestBody BookUpdateReqDto dto);
 
 
     @Component
@@ -186,8 +186,8 @@ public interface BookFeign {
         }
 
         @Override
-        public RestResp<Boolean> insertBookChapterUnlock(@RequestBody ChapterUnlockReqDto dto) {
-            return RestResp.ok( false);
+        public RestResp<Void> updateBook(BookUpdateReqDto dto) {
+            return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
         }
 
 

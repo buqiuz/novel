@@ -217,18 +217,10 @@ public interface BookService {
     RestResp<Void> deleteBook(Long bookId);
 
     /**
-     * 插入小说章节解锁信息
-     * @param userId 用户ID
-     * @param chapterId 章节ID
+     * 更新小说信息
+     *
+     * @param dto 小说更新信息
      * @return 操作结果
      */
-    RestResp<Boolean> insertBookChapterUnlock(Long userId, Long chapterId);
-
-    /**
-     * 获取小说章节解锁信息
-     * @param userId 用户ID
-     * @param chapterId 章节ID
-     * @return 操作结果
-     */
-    RestResp<Boolean> getBookChapterUnlock(Long userId, Long chapterId);
+    RestResp<Void> updateBook(BookUpdateReqDto dto);
 }

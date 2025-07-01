@@ -7,6 +7,7 @@ import io.github.xxyopen.novel.book.dto.resp.BookCategoryRespDto;
 import io.github.xxyopen.novel.common.constant.CacheConsts;
 import io.github.xxyopen.novel.common.constant.DatabaseConsts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +38,14 @@ public class BookCategoryCacheManager {
                 .id(v.getId())
                 .name(v.getName())
                 .build()).toList();
+    }
+
+    @CacheEvict(
+            cacheManager = CacheConsts.CAFFEINE_CACHE_MANAGER,
+            value = CacheConsts.BOOK_CATEGORY_LIST_CACHE_NAME,
+            key = "#workDirection"
+    )
+    public void evictCategoryCache(Integer workDirection) {
     }
 
 }

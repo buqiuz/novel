@@ -208,8 +208,7 @@ public class AiServiceImpl implements AiService {
             // 使用ObjectMapper转换为Map
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> resultMap = mapper.convertValue(result.getOutput().getResults().get(0), Map.class);
-            String url = (String) resultMap.get("url");
-            return url;
+            return (String) resultMap.get("url");
         } catch (Exception e) {
             System.out.println("文本生成图片时出错: " + e.getMessage());
             return null;
@@ -218,10 +217,8 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public String pngToJpg(String url) {
-
         try {
             return saveAsJpgToImageDir(url);
-
         } catch (Exception e) {
             System.out.println("文本生成图片时出错: " + e.getMessage());
             return null;

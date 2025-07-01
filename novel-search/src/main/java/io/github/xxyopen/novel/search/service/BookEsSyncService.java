@@ -17,4 +17,6 @@ public interface BookEsSyncService {
      * @param book 小说ID
      */
     void syncBook(BookEsRespDto book);
+
+    void removeBook(Long bookId);
 }

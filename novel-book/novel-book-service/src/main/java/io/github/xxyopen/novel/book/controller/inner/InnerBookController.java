@@ -147,11 +147,12 @@ public class InnerBookController {
     }
 
     /**
-     * 解锁章节
+     * 更新小说信息
      */
-    @Operation(summary = "解锁章节")
-    @PostMapping("insertBookChapterUnlock")
-    public RestResp<Boolean> insertBookChapterUnlock(@RequestBody ChapterUnlockReqDto dto){
-        return bookService.insertBookChapterUnlock(dto.getUserId(),dto.getChapterId());
+    @Operation(summary = "更新小说信息")
+    @PostMapping("updateBook")
+    public RestResp<Void> updateBook(@Valid @RequestBody BookUpdateReqDto dto) {
+        return bookService.updateBook(dto);
     }
+
 }

@@ -60,14 +60,18 @@ public class BookChangeMqListener {
         try {
             BookInfo bookInfo = bookInfoMapper.selectById(bookId);
             if (bookInfo != null) {
+                // 有书籍：转换并同步到 ES
                 BookEsRespDto esDto = BookConverter.toEsDto(bookInfo);
                 bookEsSyncService.syncBook(esDto);
                 log.info("已同步书籍 {} 到 ES", bookId);
             } else {
-                log.warn("未找到ID为 {} 的书籍", bookId);
+                // 无此书：从 ES 删除
+                bookEsSyncService.removeBook(bookId);
+                log.info("已从 ES 删除书籍 {}", bookId);
             }
         } catch (Exception e) {
-            log.error("同步书籍到 ES 失败，书籍ID={}，原因={}", bookId, e.getMessage(), e);
+            log.error("处理书籍变更消息失败，书籍ID={}，原因={}", bookId, e.getMessage(), e);
         }
     }
+
 }
