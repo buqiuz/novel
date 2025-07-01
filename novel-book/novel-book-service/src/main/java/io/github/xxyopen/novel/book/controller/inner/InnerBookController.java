@@ -146,4 +146,13 @@ public class InnerBookController {
         return bookService.deleteBook(bookId);
     }
 
+    /**
+     * 更新小说信息
+     */
+    @Operation(summary = "更新小说信息")
+    @PostMapping("updateBook")
+    public RestResp<Void> updateBook(@Valid @RequestBody BookUpdateReqDto dto) {
+        return bookService.updateBook(dto);
+    }
+
 }

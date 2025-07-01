@@ -215,4 +215,12 @@ public interface BookService {
      * @return 操作结果
      */
     RestResp<Void> deleteBook(Long bookId);
+
+    /**
+     * 更新小说信息
+     *
+     * @param dto 小说更新信息
+     * @return 操作结果
+     */
+    RestResp<Void> updateBook(BookUpdateReqDto dto);
 }

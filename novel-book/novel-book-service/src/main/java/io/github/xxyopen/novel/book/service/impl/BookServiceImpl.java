@@ -649,4 +649,51 @@ public class BookServiceImpl implements BookService {
         return RestResp.ok();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public RestResp<Void> updateBook(BookUpdateReqDto dto) {
+        // 1. 查询小说是否存在
+        BookInfo bookInfo = bookInfoMapper.selectById(dto.getId());
+        if (bookInfo == null) {
+            return RestResp.fail(ErrorCodeEnum.BOOK_NOT_EXIST);
+        }
+
+        // 2. 校验作者是否有权限更新小说
+        if (!Objects.equals(bookInfo.getAuthorId(), dto.getAuthorId())) {
+            return RestResp.fail(ErrorCodeEnum.USER_UN_AUTH);
+        }
+
+        // 3. 如果小说名修改，检查新名称是否已存在
+        if (!Objects.equals(bookInfo.getBookName(), dto.getBookName())) {
+            QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq(DatabaseConsts.BookTable.COLUMN_BOOK_NAME, dto.getBookName())
+                    .ne(DatabaseConsts.CommonColumnEnum.ID.getName(), dto.getId());
+            if (bookInfoMapper.selectCount(queryWrapper) > 0) {
+                return RestResp.fail(ErrorCodeEnum.AUTHOR_BOOK_NAME_EXIST);
+            }
+        }
+
+        // 4. 更新小说信息
+        BookInfo updateBookInfo = new BookInfo();
+        updateBookInfo.setId(dto.getId());
+        updateBookInfo.setWorkDirection(dto.getWorkDirection());
+        updateBookInfo.setCategoryId(dto.getCategoryId());
+        updateBookInfo.setCategoryName(dto.getCategoryName());
+        updateBookInfo.setPicUrl(dto.getPicUrl());
+        updateBookInfo.setBookName(dto.getBookName());
+        updateBookInfo.setBookDesc(dto.getBookDesc());
+        updateBookInfo.setBookStatus(dto.getBookStatus());
+        updateBookInfo.setIsVip(dto.getIsVip());
+        updateBookInfo.setUpdateTime(LocalDateTime.now());
+        bookInfoMapper.updateById(updateBookInfo);
+
+        // 5. 清除缓存
+        bookInfoCacheManager.evictBookInfoCache(dto.getId());
+
+        // 6. 发送MQ消息，通知其他服务小说已更新
+        amqpMsgManager.sendBookChangeMsg(dto.getId());
+
+        return RestResp.ok();
+    }
+
 }

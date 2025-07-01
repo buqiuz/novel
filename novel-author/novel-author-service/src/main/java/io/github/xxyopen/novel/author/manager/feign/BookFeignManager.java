@@ -70,4 +70,10 @@ public class BookFeignManager {
     public RestResp<Void> deleteBook(Long bookId) {
         return bookFeign.deleteBook(bookId);
     }
+
+    public RestResp<Void> updateBook(BookUpdateReqDto dto) {
+        AuthorInfoDto author = authorInfoCacheManager.getAuthor(UserHolder.getUserId());
+        dto.setAuthorId(author.getId());
+        return bookFeign.updateBook(dto);
+    }
 }
