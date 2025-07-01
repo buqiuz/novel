@@ -40,4 +40,17 @@ public class BookEsSyncServiceImpl implements BookEsSyncService {
             throw new RuntimeException("同步 Elasticsearch 失败", e);
         }
     }
+    @Override
+    public void removeBook(Long bookId) {
+        try {
+            elasticsearchClient.delete(d -> d
+                    .index(EsConsts.BookIndex.INDEX_NAME)
+                    .id(bookId.toString())
+            );
+        } catch (Exception e) {
+            log.error("从 ES 删除书籍失败，bookId={}", bookId, e);
+            throw new RuntimeException("从 Elasticsearch 删除失败", e);
+        }
+    }
+
 }
