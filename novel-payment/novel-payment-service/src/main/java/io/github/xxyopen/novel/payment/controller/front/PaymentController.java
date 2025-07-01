@@ -5,6 +5,7 @@ import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -16,6 +17,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
+
+    @Value("${novel.front.home-url}")
+    private String homeUrl;
     /**
      * 支付接口
      */
@@ -33,16 +37,16 @@ public class PaymentController {
             @PathVariable String encodedUserId,
             @RequestParam Map<String, String> params) {
         paymentService.processAlipayPaymentCallback(encodedUserId,params);
-        return generateRedirectPage();
+        return generateRedirectPage(homeUrl);
     }
-    private String generateRedirectPage() {
+    private String generateRedirectPage(String redirectUrl) {
         return "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
                 "    <title>支付结果</title>\n" +
                 "    <script type=\"text/javascript\">\n" +
-                "        window.location.href = '" + "http://localhost:20000/" + "';\n" +
+                "        window.location.href = '" + redirectUrl + "';\n" +
                 "    </script>\n" +
                 "</head>\n" +
                 "<body>\n" +

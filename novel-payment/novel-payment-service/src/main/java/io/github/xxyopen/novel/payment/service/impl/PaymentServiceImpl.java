@@ -37,6 +37,9 @@ public class PaymentServiceImpl implements PaymentService {
     private String gatewayurl;
     @Value("${alipay.return-url}")
     private String returnUrl;
+    @Value("${novel.front.home-url}")
+    private String home_url;
+
     @Value("${coin.exchange-rate}")
     private Integer exchangeRate;
     private Config getOptions() {
@@ -48,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
         config.merchantPrivateKey = privateKey;
         config.alipayPublicKey = alipayPublicKey;
         config.encryptKey = "";
-        config.notifyUrl = returnUrl;
+        config.notifyUrl = home_url+returnUrl;
         return config;
     }
     private String generateTradeNo() {
@@ -83,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
                 String.valueOf(userId).getBytes(StandardCharsets.UTF_8)
         );
         // 动态拼接完整的回调地址
-        String finalReturnUrl = String.format(returnUrl, encodedUserId);
+        String finalReturnUrl = String.format(home_url+returnUrl, encodedUserId);
         Factory.setOptions(getOptions());
         try{
             AlipayTradePagePayResponse response =Payment.Page().pay("书币充值",this.generateTradeNo(),String.valueOf(money),finalReturnUrl);
