@@ -51,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
         config.merchantPrivateKey = privateKey;
         config.alipayPublicKey = alipayPublicKey;
         config.encryptKey = "";
-        config.notifyUrl = home_url+returnUrl;
+        config.notifyUrl = returnUrl;
         return config;
     }
     private String generateTradeNo() {
@@ -86,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
                 String.valueOf(userId).getBytes(StandardCharsets.UTF_8)
         );
         // 动态拼接完整的回调地址
-        String finalReturnUrl = String.format(home_url+returnUrl, encodedUserId);
+        String finalReturnUrl = String.format(returnUrl, encodedUserId);
         Factory.setOptions(getOptions());
         try{
             AlipayTradePagePayResponse response =Payment.Page().pay("书币充值",this.generateTradeNo(),String.valueOf(money),finalReturnUrl);
