@@ -187,4 +187,16 @@ public class FrontBookController {
         @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") Integer pageSize) {
         return bookService.listAllBookInfos(pageNum, pageSize);
     }
+
+    /**
+     * 查询书评信息接口
+     */
+    @Operation(summary = "查询书评信息接口")
+    @GetMapping("comment/user_list")
+    public RestResp<PageRespDto<UserCommentRespDto>> listUserComments(
+        @Parameter(description = "用户ID") Long userId,
+        @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,
+        @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") Integer pageSize) {
+        return bookService.listUserComments(userId, pageNum, pageSize);
+    }
 }

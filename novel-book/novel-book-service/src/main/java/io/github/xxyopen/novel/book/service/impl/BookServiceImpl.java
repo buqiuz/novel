@@ -742,4 +742,36 @@ public class BookServiceImpl implements BookService {
 
         return RestResp.ok(PageRespDto.of(pageNum, pageSize, bookInfoPage.getTotal(), bookInfoPage.getRecords()));
     }
+    @Override
+    public RestResp<PageRespDto<UserCommentRespDto>> listUserComments(Long userId, Integer pageNum, Integer pageSize) {
+        try{
+            Page<BookComment> page = new Page<>(pageNum, pageSize);
+            // 构造查询条件：根据用户ID查询
+            QueryWrapper<BookComment> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId).orderByDesc("id");
+            // 计算总记录数
+            long total = bookCommentMapper.selectCount(queryWrapper);
+            // 执行分页查询
+            IPage<BookComment> result = bookCommentMapper.selectPage(page, queryWrapper);
+            // 从BookComment中获取信息构建UserCommentRespDto，仅保留userId，bookId，bookName，commentContent, createTime
+            List<UserCommentRespDto> commentList = result.getRecords().stream()
+                    .map(comment -> {
+                        BookInfo bookInfo = bookInfoMapper.selectById(comment.getBookId());
+                        return UserCommentRespDto.builder()
+                                .user_id(comment.getUserId())
+                                .book_id(comment.getBookId())
+                                .book_name(bookInfo != null ? bookInfo.getBookName() : "未知小说")
+                                .comment_content(comment.getCommentContent())
+                                .createTime(comment.getCreateTime())
+                                .build();
+                    })
+                    .toList();
+            PageRespDto<UserCommentRespDto> pageResp = PageRespDto.of(pageNum, pageSize, total, commentList);
+            return RestResp.ok(pageResp);
+        } catch (Exception e) {
+            System.out.println("查询书评日志异常，原因：" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
 }

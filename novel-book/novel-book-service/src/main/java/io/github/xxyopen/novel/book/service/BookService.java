@@ -248,4 +248,14 @@ public interface BookService {
      * @return 分页小说信息列表
      */
     RestResp<PageRespDto<BookInfo>> listAllBookInfos(Integer pageNum, Integer pageSize);
+
+    /**
+     * 查询用户评论列表
+     *
+     * @param userId 用户ID
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @return 分页用户评论列表
+     */
+    RestResp<PageRespDto<UserCommentRespDto>> listUserComments(Long userId, Integer pageNum, Integer pageSize);
 }
