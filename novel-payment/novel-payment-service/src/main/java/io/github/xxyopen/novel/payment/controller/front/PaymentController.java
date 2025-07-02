@@ -2,6 +2,8 @@ package io.github.xxyopen.novel.payment.controller.front;
 
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.payment.dao.entity.WalletLog;
+import io.github.xxyopen.novel.payment.dto.resp.WalletLogRespDto;
 import io.github.xxyopen.novel.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "FrontPaymentController", description = "前台门户-支付模块")
@@ -72,5 +75,15 @@ public class PaymentController {
             @RequestParam("chapterId") Long chapterId,
             @RequestParam("goldCoins") Long goldCoins ) {
         return paymentService.useGold(userId,chapterId,goldCoins);
+    }
+    /**
+     * 获取流水记录
+     */
+    @GetMapping("/walletLog")
+    public RestResp<WalletLogRespDto> getWalletLog(
+            @RequestParam("userId") Long userId,
+            @RequestParam("pageNum") Long pageNum,
+            @RequestParam("pageSize") Long pageSize ){
+        return paymentService.getWalletLog(userId,pageNum,pageSize);
     }
 }

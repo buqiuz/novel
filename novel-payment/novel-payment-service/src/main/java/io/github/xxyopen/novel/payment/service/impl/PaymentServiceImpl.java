@@ -5,7 +5,10 @@ import io.github.xxyopen.novel.book.dto.req.ChapterUnlockReqDto;
 import io.github.xxyopen.novel.book.feign.BookFeign;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.payment.dao.entity.UserWallet;
+import io.github.xxyopen.novel.payment.dao.entity.WalletLog;
 import io.github.xxyopen.novel.payment.dao.mapper.UserWalletMapper;
+import io.github.xxyopen.novel.payment.dao.mapper.WalletLogMapper;
+import io.github.xxyopen.novel.payment.dto.resp.WalletLogRespDto;
 import io.github.xxyopen.novel.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 import com.alipay.easysdk.factory.Factory;
@@ -26,11 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import io.github.xxyopen.novel.common.resp.RestResp;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 @Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private UserWalletMapper userWalletMapper;
+    @Autowired
+    private WalletLogMapper walletLogMapper;
     @Autowired
     private BookFeign bookFeign;
     @Value("${alipay.app-id}")
@@ -65,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
         return LocalDateTime.now(ZoneOffset.of("+8")).format(formatter);
     }
 
-    private void addCoins(Long userId,long  coins){
+    private void addCoins(Long userId,long  coins,String subject){
         try{
             UserWallet wallet = userWalletMapper.selectById(userId);
             if(wallet == null){
@@ -79,7 +89,13 @@ public class PaymentServiceImpl implements PaymentService {
                 log.warn("更新用户钱包失败，userId={}", userId);
                 throw new RuntimeException("更新用户钱包失败");
             }
-            log.info("用户充值成功，userId={}, 书币数={}", userId, coins);
+            //添加钱包日志
+            WalletLog log = new WalletLog();
+            log.setUserId(userId);
+            log.setAmount(coins);
+            log.setSubject(subject);
+            log.setCreatedAt(LocalDateTime.now());
+            walletLogMapper.insert(log);
         } catch (Exception e) {
             System.out.println("添加书币异常，原因："+e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
@@ -115,7 +131,7 @@ public class PaymentServiceImpl implements PaymentService {
         Long userId = Long.valueOf(new String(decodedBytes, StandardCharsets.UTF_8));
         BigDecimal money = new BigDecimal(params.get("total_amount"));
         long coinsToAdd = money.multiply(BigDecimal.valueOf(exchangeRate)).longValueExact();
-        addCoins(userId, coinsToAdd);
+        addCoins(userId, coinsToAdd,"账户充值");
     }
 
     @Override
@@ -143,6 +159,13 @@ public class PaymentServiceImpl implements PaymentService {
                 wallet.setUpdatedTime(LocalDateTime.now());
                 int rows = userWalletMapper.updateById(wallet);
                 if(rows > 0){
+                    // 添加钱包日志
+                    WalletLog log = new WalletLog();
+                    log.setUserId(userId);
+                    log.setAmount(-goldCoins);
+                    log.setSubject("使用书币解锁章节");
+                    log.setCreatedAt(LocalDateTime.now());
+                    walletLogMapper.insert(log);
                     ChapterUnlockReqDto dto = new ChapterUnlockReqDto();
                     dto.setUserId(userId);
                     dto.setChapterId(chapterId);
@@ -156,6 +179,27 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (Exception e) {
             System.out.println("使用书币异常，原因："+e.getMessage());
             throw new RuntimeException(e.getMessage(),e);
+        }
+    }
+    @Override
+    public RestResp<WalletLogRespDto> getWalletLog(Long userId, Long pageNum, Long pageSize) {
+        try {
+            // 创建分页对象，从第 pageNum 页开始，每页显示 pageSize 条记录
+            Page<WalletLog> page = new Page<>(pageNum, pageSize);
+            // 构造查询条件：根据用户ID查询对应的流水日志
+            QueryWrapper<WalletLog> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId);
+            WalletLogRespDto walletLogRespDto = new WalletLogRespDto();
+            // 计算总记录数
+            walletLogRespDto.setTotal(walletLogMapper.selectCount(queryWrapper));
+            // 执行分页查询
+            IPage<WalletLog> result = walletLogMapper.selectPage(page, queryWrapper);
+            walletLogRespDto.setWalletLogs(result.getRecords());
+            // 返回查询结果
+            return RestResp.ok(walletLogRespDto);
+        } catch (Exception e) {
+            System.out.println("查询用户钱包日志异常，原因：" + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
