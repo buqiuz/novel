@@ -1,6 +1,7 @@
 package io.github.xxyopen.novel.book.service;
 
 
+import io.github.xxyopen.novel.book.dao.entity.BookInfo;
 import io.github.xxyopen.novel.book.dto.req.*;
 import io.github.xxyopen.novel.book.dto.resp.*;
 import io.github.xxyopen.novel.common.resp.PageRespDto;
@@ -238,4 +239,13 @@ public interface BookService {
      * @return 操作结果
      */
     RestResp<Boolean> getBookChapterUnlock(Long userId,Long chapterId);
+
+    /**
+     * 查询所有小说信息列表
+     *
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @return 分页小说信息列表
+     */
+    RestResp<PageRespDto<BookInfo>> listAllBookInfos(Integer pageNum, Integer pageSize);
 }
