@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -29,17 +31,30 @@ public class PaymentController {
     @PostMapping("/toPay")
     public String toPay(
             @RequestParam("userId") Long userId,
+            @RequestParam("bookId") Long bookId,
+            @RequestParam("chapterId") Long chapterId,
             @RequestParam("money") BigDecimal money) {
-        return paymentService.toPay(userId, money);
+        return paymentService.toPay(userId,money,bookId,chapterId);
     }
     /**
      * 支付宝支付回调
      */
-    @GetMapping("/alipay/return/{encodedUserId}")
+    @GetMapping("/alipay/return/{encodedUserId}/{encodedBookId}/{encodedChapterId}")
     public String alipayReturn(
             @PathVariable String encodedUserId,
+            @PathVariable String encodedBookId,
+            @PathVariable String encodedChapterId,
             @RequestParam Map<String, String> params) {
         paymentService.processAlipayPaymentCallback(encodedUserId,params);
+        byte[] decodedBookBytes = Base64.getUrlDecoder().decode(encodedBookId);
+        Long bookId = Long.valueOf(new String(decodedBookBytes, StandardCharsets.UTF_8));
+        byte[] decodedChapterBytes = Base64.getUrlDecoder().decode(encodedChapterId);
+        Long chapterId = Long.valueOf(new String(decodedChapterBytes, StandardCharsets.UTF_8));
+        System.out.println("书籍ID"+bookId);
+        System.out.println("章节ID"+chapterId);
+        if(bookId != 0 && chapterId != 0){
+            return generateRedirectPage(homeUrl+"/#/book/"+bookId+"/"+chapterId);
+        }
         return generateRedirectPage(homeUrl);
     }
     private String generateRedirectPage(String redirectUrl) {

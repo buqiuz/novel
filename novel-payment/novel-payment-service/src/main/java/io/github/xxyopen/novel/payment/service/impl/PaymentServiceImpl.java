@@ -102,13 +102,21 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
     @Override
-    public String toPay(Long userId, BigDecimal money) {
+    public String toPay(Long userId, BigDecimal money, Long bookId, Long chapterId) {
         // 对用户ID进行Base64编码
         String encodedUserId = Base64.getUrlEncoder().encodeToString(
                 String.valueOf(userId).getBytes(StandardCharsets.UTF_8)
         );
+        // 对书籍ID进行Base64编码
+        String encodedBookId = Base64.getUrlEncoder().encodeToString(
+                String.valueOf(bookId).getBytes(StandardCharsets.UTF_8)
+        );
+        // 对章节ID进行Base64编码
+        String encodedChapterId = Base64.getUrlEncoder().encodeToString(
+                String.valueOf(chapterId).getBytes(StandardCharsets.UTF_8)
+        );
         // 动态拼接完整的回调地址
-        String finalReturnUrl = String.format(returnUrl, encodedUserId);
+        String finalReturnUrl = String.format(returnUrl, encodedUserId, encodedBookId, encodedChapterId);
         Factory.setOptions(getOptions());
         try{
             AlipayTradePagePayResponse response =Payment.Page().pay("书币充值",this.generateTradeNo(),String.valueOf(money),finalReturnUrl);
