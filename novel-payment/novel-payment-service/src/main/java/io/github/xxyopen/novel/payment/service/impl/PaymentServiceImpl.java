@@ -196,7 +196,7 @@ public class PaymentServiceImpl implements PaymentService {
             Page<WalletLog> page = new Page<>(pageNum, pageSize);
             // 构造查询条件：根据用户ID查询对应的流水日志
             QueryWrapper<WalletLog> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_id", userId);
+            queryWrapper.eq("user_id", userId).orderByDesc("id");
             WalletLogRespDto walletLogRespDto = new WalletLogRespDto();
             // 计算总记录数
             walletLogRespDto.setTotal(walletLogMapper.selectCount(queryWrapper));
