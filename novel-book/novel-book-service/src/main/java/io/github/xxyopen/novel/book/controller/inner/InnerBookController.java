@@ -150,6 +150,7 @@ public class InnerBookController {
      * 更新小说信息
      */
     @Operation(summary = "更新小说信息")
+    @CrossOrigin(origins = "*")
     @PostMapping("updateBook")
     public RestResp<Void> updateBook(@Valid @RequestBody BookUpdateReqDto dto) {
         return bookService.updateBook(dto);
