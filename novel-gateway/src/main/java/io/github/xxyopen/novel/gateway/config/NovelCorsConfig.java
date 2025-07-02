@@ -19,20 +19,19 @@ public class NovelCorsConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        // 允许的域名（本地 + 公网）
-        config.addAllowedOrigin("http://localhost:20000");
+        // 允许 localhost 的任意端口
+        config.addAllowedOriginPattern("http://localhost:*");
+        // 其他域名
         config.addAllowedOrigin("http://buqiu.icu");
         config.addAllowedOrigin("https://buqiu.icu");
 
-        // 允许的头信息
         config.addAllowedHeader("*");
-        // 允许的请求方式
         config.addAllowedMethod("*");
-        // 是否允许携带Cookie信息
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
         configurationSource.registerCorsConfiguration("/**", config);
         return new CorsWebFilter(configurationSource);
     }
+
 }

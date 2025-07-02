@@ -54,6 +54,8 @@ public class BookServiceImpl implements BookService {
 
     private final BookContentCacheManager bookContentCacheManager;
 
+    private final HomeBookCacheManager homeBookCacheManager;
+
     private final BookInfoMapper bookInfoMapper;
 
     private final BookChapterMapper bookChapterMapper;
@@ -638,6 +640,7 @@ public class BookServiceImpl implements BookService {
 
         // 5. 清除相关缓存
         bookInfoCacheManager.evictBookInfoCache(bookId);
+        homeBookCacheManager.evictCache();
 
         // 6. 发送MQ消息，通知其他服务小说已被删除
         amqpMsgManager.sendBookChangeMsg(bookId);
@@ -685,6 +688,7 @@ public class BookServiceImpl implements BookService {
 
         // 5. 清除缓存
         bookInfoCacheManager.evictBookInfoCache(dto.getId());
+        homeBookCacheManager.evictCache();
 
         // 6. 发送MQ消息，通知其他服务小说已更新
         amqpMsgManager.sendBookChangeMsg(dto.getId());
@@ -721,5 +725,21 @@ public class BookServiceImpl implements BookService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public RestResp<PageRespDto<BookInfo>> listAllBookInfos(Integer pageNum, Integer pageSize) {
+        IPage<BookInfo> page = new Page<>();
+        page.setCurrent(pageNum);
+        page.setSize(pageSize);
+
+        QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
+        // 先按创建时间排序，再按ID排序，保证排序的唯一性
+        queryWrapper.orderByDesc(DatabaseConsts.CommonColumnEnum.CREATE_TIME.getName())
+                    .orderByDesc(DatabaseConsts.CommonColumnEnum.ID.getName());
+
+        IPage<BookInfo> bookInfoPage = bookInfoMapper.selectPage(page, queryWrapper);
+
+        return RestResp.ok(PageRespDto.of(pageNum, pageSize, bookInfoPage.getTotal(), bookInfoPage.getRecords()));
     }
 }

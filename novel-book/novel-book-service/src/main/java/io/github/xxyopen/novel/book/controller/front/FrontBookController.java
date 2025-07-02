@@ -1,8 +1,10 @@
 package io.github.xxyopen.novel.book.controller.front;
 
+import io.github.xxyopen.novel.book.dao.entity.BookInfo;
 import io.github.xxyopen.novel.book.dto.resp.*;
 import io.github.xxyopen.novel.book.service.BookService;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
+import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -173,5 +175,16 @@ public class FrontBookController {
             @Parameter(description = "用户ID") Long userId,
             @Parameter(description = "章节ID") Long chapterId ) {
         return bookService.getBookChapterUnlock(userId, chapterId);
+    }
+
+    /**
+     * 查询所有小说信息接口
+     */
+    @Operation(summary = "查询所有小说信息接口")
+    @GetMapping("listAll")
+    public RestResp<PageRespDto<BookInfo>> listAllBookInfos(
+        @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,
+        @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") Integer pageSize) {
+        return bookService.listAllBookInfos(pageNum, pageSize);
     }
 }
