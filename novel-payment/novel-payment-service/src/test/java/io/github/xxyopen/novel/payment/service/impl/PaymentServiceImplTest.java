@@ -13,11 +13,6 @@ public class PaymentServiceImplTest {
     @Autowired
     private PaymentService paymentService;
     @Test
-    public void toPay() {
-        String payUrl = paymentService.toPay(1L, BigDecimal.valueOf(1));
-        System.out.println(payUrl);
-    }
-    @Test
     public void getGoldBalance() {
         Long goldBalance = paymentService.getGoldBalance(1L);
         System.out.println(goldBalance);

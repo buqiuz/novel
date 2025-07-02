@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface PaymentService {
     // 使用支付宝进行支付
-    String toPay(Long userId, BigDecimal money);
+    String toPay(Long userId, BigDecimal money, Long bookId, Long chapterId);
     // 处理支付宝回调
     void processAlipayPaymentCallback(String encodedUserId,Map<String, String> params);
     // 查询金币余额
