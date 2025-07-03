@@ -182,8 +182,17 @@ public enum ErrorCodeEnum {
     /**
      * 更新推荐小说失败
      */
-    UPDATE_HOME_BOOK_ERROR("A3010", "更新推荐小说失败");
+    UPDATE_HOME_BOOK_ERROR("A3010", "更新推荐小说失败"),
 
+    /**
+     * 书架添加书籍失败
+     */
+    USER_BOOKSHELF_EXIST("A3011", "书架添加书籍失败"),
+
+    /**
+     * 书架删除书籍失败
+     */
+    USER_BOOKSHELF_NOT_EXIST("A3012", "书架删除书籍失败");
     /**
      * 错误码
      */

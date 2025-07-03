@@ -17,10 +17,7 @@ import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
-import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserLoginRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserReadHistoryRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserRegisterRespDto;
+import io.github.xxyopen.novel.user.dto.resp.*;
 import io.github.xxyopen.novel.user.manager.redis.VerifyCodeManager;
 import io.github.xxyopen.novel.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -250,5 +247,61 @@ public class UserServiceImpl implements UserService {
             dtoList.add(dto);
         }
         return RestResp.ok(PageRespDto.of(pageNum, pageSize, result.getTotal(), dtoList));
+    }
+    @Override
+    public RestResp<PageRespDto<UserBookshelfRespDto>> listUserBookshelf(Long userId, Integer pageNum, Integer pageSize){
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).orderByDesc("id");
+        Page<UserBookshelf> page = new Page<>(pageNum, pageSize);
+        Page<UserBookshelf> result = userBookshelfMapper.selectPage(page, queryWrapper);
+        RestResp<Map<Long, String>> res1 = bookFeign.listBookNames(result.getRecords().stream().map(UserBookshelf::getBookId).toList());
+        Map<Long, String> bookNames = res1.getData();
+        RestResp<Map<Long, String>> res2 = bookFeign.listChapterNames(result.getRecords().stream().map(UserBookshelf::getPreContentId).toList());
+        Map<Long, String> chapterNames = res2.getData();
+        List<UserBookshelfRespDto> dtoList = new ArrayList<>();
+        for (UserBookshelf bookshelf : result.getRecords()) {
+            UserBookshelfRespDto dto = UserBookshelfRespDto.builder()
+                    .userId(userId)
+                    .bookId(bookshelf.getBookId())
+                    .preContentId(bookshelf.getPreContentId())
+                    .bookName(bookNames.getOrDefault(bookshelf.getBookId(), "未知小说"))
+                    .preChapterName(chapterNames.getOrDefault(bookshelf.getPreContentId(), "未知章节"))
+                    .updateTime(bookshelf.getUpdateTime())
+                    .build();
+            dtoList.add(dto);
+        }
+        return RestResp.ok(PageRespDto.of(pageNum, pageSize, result.getTotal(), dtoList));
+    }
+    @Override
+    public RestResp<Void> addBookshelf(Long userId, Long bookId, Long preContentId){
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).eq("book_id", bookId);
+        if(userBookshelfMapper.selectCount(queryWrapper) > 0){
+            return RestResp.fail(ErrorCodeEnum.USER_BOOKSHELF_EXIST);
+        }
+        UserBookshelf userBookshelf = new UserBookshelf();
+        userBookshelf.setUserId(userId);
+        userBookshelf.setBookId(bookId);
+        userBookshelf.setPreContentId(preContentId);
+        userBookshelf.setCreateTime(LocalDateTime.now());
+        userBookshelf.setUpdateTime(LocalDateTime.now());
+        userBookshelfMapper.insert(userBookshelf);
+        return RestResp.ok();
+    }
+    @Override
+    public RestResp<Void> deleteBookshelf(Long userId, Long bookId){
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).eq("book_id", bookId);
+        if(userBookshelfMapper.selectCount(queryWrapper) == 0){
+            return RestResp.fail(ErrorCodeEnum.USER_BOOKSHELF_NOT_EXIST);
+        }
+        userBookshelfMapper.delete(queryWrapper);
+        return RestResp.ok();
+    }
+    @Override
+    public RestResp<Boolean> isInBookshelf(Long userId, Long bookId){
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).eq("book_id", bookId);
+        return userBookshelfMapper.selectCount(queryWrapper) > 0 ? RestResp.ok(Boolean.TRUE) : RestResp.ok(Boolean.FALSE);
     }
 }

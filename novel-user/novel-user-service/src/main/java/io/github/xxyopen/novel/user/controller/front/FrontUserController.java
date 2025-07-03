@@ -10,10 +10,7 @@ import io.github.xxyopen.novel.user.dao.entity.UserReadHistory;
 import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
-import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserLoginRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserReadHistoryRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserRegisterRespDto;
+import io.github.xxyopen.novel.user.dto.resp.*;
 import io.github.xxyopen.novel.user.manager.feign.BookFeignManager;
 import io.github.xxyopen.novel.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -161,4 +158,44 @@ public class FrontUserController {
         return userService.listUserReadHistory(UserHolder.getUserId(), pageNum, pageSize);
     }
 
+    /**
+     * 查询用户书架接口
+     */
+    @Operation(summary = "查询用户书架接口")
+    @GetMapping("bookshelf")
+    public RestResp<PageRespDto<UserBookshelfRespDto>> listUserBookshelf(
+            @Parameter(description = "页码") @RequestParam Integer pageNum,
+            @Parameter(description = "每页条数") @RequestParam Integer pageSize) {
+        return userService.listUserBookshelf(UserHolder.getUserId(), pageNum, pageSize);
+    }
+
+    /**
+     * 添加用户书架接口
+     */
+    @Operation(summary = "添加用户书架接口")
+    @PostMapping("addBookshelf")
+    public RestResp<Void> addBookshelf(
+            @Parameter(description = "小说ID") @RequestParam Long bookId,
+            @Parameter(description = "小说最新章节ID") @RequestParam Long preContentId ){
+        return userService.addBookshelf(UserHolder.getUserId(), bookId, preContentId);
+    }
+
+    /**
+     * 删除用户书架接口
+     */
+    @Operation(summary = "删除用户书架接口")
+    @DeleteMapping("deleteBookshelf")
+    public RestResp<Void> deleteBookshelf(
+            @Parameter(description = "小说ID") @RequestParam Long bookId ){
+        return userService.deleteBookshelf(UserHolder.getUserId(), bookId);
+    }
+    /**
+     * 判断书籍是否在书架中
+     */
+    @Operation(summary = "判断书籍是否在书架中")
+    @GetMapping("isInBookshelf")
+    public RestResp<Boolean> isInBookshelf(
+            @Parameter(description = "小说ID") @RequestParam Long bookId ){
+        return userService.isInBookshelf(UserHolder.getUserId(), bookId);
+    }
 }

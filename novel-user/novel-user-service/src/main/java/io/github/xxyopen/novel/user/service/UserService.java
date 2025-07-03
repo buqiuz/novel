@@ -8,10 +8,7 @@ import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
-import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserLoginRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserReadHistoryRespDto;
-import io.github.xxyopen.novel.user.dto.resp.UserRegisterRespDto;
+import io.github.xxyopen.novel.user.dto.resp.*;
 
 import java.util.List;
 
@@ -106,4 +103,22 @@ public interface UserService {
      * 获取用户阅读记录
      */
     RestResp<PageRespDto<UserReadHistoryRespDto>> listUserReadHistory(Long userId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取用户书架
+     */
+    RestResp<PageRespDto<UserBookshelfRespDto>> listUserBookshelf(Long userId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 添加书籍到用户书架
+     */
+    RestResp<Void> addBookshelf(Long userId, Long bookId, Long preContentId);
+    /**
+     * 删除用户书架书籍
+     */
+    RestResp<Void> deleteBookshelf(Long userId, Long bookId);
+    /**
+     * 查看是否位于书架
+     */
+    RestResp<Boolean> isInBookshelf(Long userId, Long bookId);
 }
