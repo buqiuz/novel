@@ -2,6 +2,8 @@ package io.github.xxyopen.novel.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.xxyopen.novel.book.dto.req.BookshelfInfoReqDto;
+import io.github.xxyopen.novel.book.dto.resp.BookshelfInfoRespDto;
 import io.github.xxyopen.novel.book.feign.BookFeign;
 import io.github.xxyopen.novel.common.auth.JwtUtils;
 import io.github.xxyopen.novel.common.constant.CommonConsts;
@@ -256,19 +258,28 @@ public class UserServiceImpl implements UserService {
         queryWrapper.eq("user_id", userId).orderByDesc("id");
         Page<UserBookshelf> page = new Page<>(pageNum, pageSize);
         Page<UserBookshelf> result = userBookshelfMapper.selectPage(page, queryWrapper);
-        RestResp<Map<Long, String>> res1 = bookFeign.listBookNames(result.getRecords().stream().map(UserBookshelf::getBookId).toList());
-        Map<Long, String> bookNames = res1.getData();
-        RestResp<Map<Long, String>> res2 = bookFeign.listChapterNames(result.getRecords().stream().map(UserBookshelf::getPreContentId).toList());
-        Map<Long, String> chapterNames = res2.getData();
+        List<BookshelfInfoReqDto> Dto = result.getRecords().stream()
+            .map(bookshelf -> BookshelfInfoReqDto.builder()
+                .bookId(bookshelf.getBookId())
+                .preContentId(bookshelf.getPreContentId())
+                .build())
+            .toList();
+        RestResp<List<BookshelfInfoRespDto>> res = bookFeign.listBookChapterNamesAndPics(Dto);
+        List<BookshelfInfoRespDto> bookshelfInfoRespDtos = res.getData();
         List<UserBookshelfRespDto> dtoList = new ArrayList<>();
-        for (UserBookshelf bookshelf : result.getRecords()) {
+        for (int i = 0; i < bookshelfInfoRespDtos.size(); i++) {
+            BookshelfInfoRespDto bookshelfInfo = bookshelfInfoRespDtos.get(i);
+            UserBookshelf userBookshelf = result.getRecords().get(i);
             UserBookshelfRespDto dto = UserBookshelfRespDto.builder()
-                    .userId(userId)
-                    .bookId(bookshelf.getBookId())
-                    .preContentId(bookshelf.getPreContentId())
-                    .bookName(bookNames.getOrDefault(bookshelf.getBookId(), "未知小说"))
-                    .preChapterName(chapterNames.getOrDefault(bookshelf.getPreContentId(), "未知章节"))
-                    .updateTime(bookshelf.getUpdateTime())
+                    .id(userBookshelf.getId())
+                    .userId(userBookshelf.getUserId())
+                    .bookId(userBookshelf.getBookId())
+                    .pic_url(bookshelfInfo.getPic_url() != null ? bookshelfInfo.getPic_url() : "未知封面")
+                    .bookName(bookshelfInfo.getBook_name())
+                    .preContentId(userBookshelf.getPreContentId())
+                    .preChapterName(bookshelfInfo.getPreContent_name())
+                    .createTime(userBookshelf.getCreateTime())
+                    .updateTime(userBookshelf.getUpdateTime())
                     .build();
             dtoList.add(dto);
         }

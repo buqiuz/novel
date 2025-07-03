@@ -275,5 +275,9 @@ public interface BookService {
      * 批量查询章节名
      */
     RestResp<Map<Long, String>> listChapterNames(List<Long> chapterIds);
+    /**
+     * 批量查询小说名、章节名、图片连接
+     */
+    RestResp<List<BookshelfInfoRespDto>> listBookChapterNamesAndPics(List<BookshelfInfoReqDto> Dto);
 
 }

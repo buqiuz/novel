@@ -1,10 +1,7 @@
 package io.github.xxyopen.novel.book.controller.inner;
 
 import io.github.xxyopen.novel.book.dto.req.*;
-import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
-import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
-import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
-import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
+import io.github.xxyopen.novel.book.dto.resp.*;
 import io.github.xxyopen.novel.book.service.BookService;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.PageRespDto;
@@ -15,7 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
+import io.github.xxyopen.novel.book.dto.resp.BookshelfInfoRespDto;
 import java.util.List;
 import java.util.Map;
 
@@ -191,5 +188,12 @@ public class InnerBookController {
     public RestResp<Map<Long, String>> listChapterNames(@RequestBody List<Long> chapterIds) {
         return bookService.listChapterNames(chapterIds);
     }
-
+    /**
+     * 书架信息批量查询接口
+     */
+    @Operation(summary = "书架信息批量查询接口")
+    @PostMapping("listBookShelfInfos")
+    public RestResp<List<BookshelfInfoRespDto>> listBookShelfInfos(@RequestBody List<BookshelfInfoReqDto> Dto) {
+        return bookService.listBookChapterNamesAndPics(Dto);
+    }
 }

@@ -818,4 +818,34 @@ public class BookServiceImpl implements BookService {
         List<BookChapter> bookChapters = bookChapterMapper.selectBatchIds(chapterIds);
         return RestResp.ok(bookChapters.stream().collect(Collectors.toMap(BookChapter::getId, BookChapter::getChapterName)));
     }
+    @Override
+    public RestResp<List<BookshelfInfoRespDto>> listBookChapterNamesAndPics(List<BookshelfInfoReqDto> Dto) {
+        // 提取 bookIds 与 chapterIds
+        List<Long> bookIds = Dto.stream()
+                .map(BookshelfInfoReqDto::getBookId)
+                .filter(Objects::nonNull)
+                .toList();
+        List<Long> chapterIds = Dto.stream()
+                .map(BookshelfInfoReqDto::getPreContentId)
+                .filter(Objects::nonNull)
+                .toList();
+
+        // 查询书籍与章节信息
+        List<BookInfo> bookInfos = bookInfoMapper.selectBatchIds(bookIds);
+        List<BookChapter> bookChapters = bookChapterMapper.selectBatchIds(chapterIds);
+
+        // 构建响应数据
+        List<BookshelfInfoRespDto> result = new ArrayList<>();
+        for (int i = 0; i < bookInfos.size() && i < bookChapters.size(); i++) {
+            BookInfo bookInfo = bookInfos.get(i);
+            BookChapter bookChapter = bookChapters.get(i);
+
+            result.add(BookshelfInfoRespDto.builder()
+                    .book_name(bookInfo.getBookName())
+                    .preContent_name(bookChapter.getChapterName())
+                    .pic_url(bookInfo.getPicUrl())
+                    .build());
+        }
+        return RestResp.ok(result);
+    }
 }

@@ -24,6 +24,11 @@ public class UserBookshelfRespDto {
     private Long bookId;
 
     /**
+     * 小说封面
+     */
+    private String pic_url;
+
+    /**
      * 小说名
      */
     private String bookName;

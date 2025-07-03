@@ -1,10 +1,7 @@
 package io.github.xxyopen.novel.book.feign;
 
 import io.github.xxyopen.novel.book.dto.req.*;
-import io.github.xxyopen.novel.book.dto.resp.BookChapterRespDto;
-import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
-import io.github.xxyopen.novel.book.dto.resp.BookInfoRespDto;
-import io.github.xxyopen.novel.book.dto.resp.ChapterRespDto;
+import io.github.xxyopen.novel.book.dto.resp.*;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.common.resp.PageRespDto;
@@ -136,6 +133,12 @@ public interface BookFeign {
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/listChapterNames")
     RestResp<Map<Long, String>> listChapterNames(@RequestBody List<Long> chapterIds);
 
+    /**
+     * 书架信息批量查询接口
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/listBookShelfInfos")
+    RestResp<List<BookshelfInfoRespDto>> listBookChapterNamesAndPics(@RequestBody List<BookshelfInfoReqDto> Dto);
+
     @Component
     class BookFeignFallback implements BookFeign {
 
@@ -232,6 +235,11 @@ public interface BookFeign {
         @Override
         public RestResp<Map<Long, String>> listChapterNames(List<Long> chapterIds) {
             return RestResp.ok(new HashMap<>(0));
+        }
+
+        @Override
+        public RestResp<List<BookshelfInfoRespDto>> listBookChapterNamesAndPics(List<BookshelfInfoReqDto> Dto) {
+            return RestResp.ok(new ArrayList<>(0));
         }
     }
 
