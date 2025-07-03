@@ -171,10 +171,11 @@ public class FrontBookController {
      */
     @Operation(summary = "小说章节解锁信息查询接口")
     @GetMapping("chapter/unlockInfo")
-    public RestResp<Boolean> getBookChapterUnlock(
+    public RestResp<Integer> getBookChapterUnlock(
             @Parameter(description = "用户ID") Long userId,
+            @Parameter(description = "书籍ID") Long bookId,
             @Parameter(description = "章节ID") Long chapterId ) {
-        return bookService.getBookChapterUnlock(userId, chapterId);
+        return bookService.getBookChapterUnlock(userId,bookId, chapterId);
     }
 
     /**

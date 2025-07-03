@@ -239,7 +239,7 @@ public interface BookService {
      * @param chapterId 章节ID
      * @return 操作结果
      */
-    RestResp<Boolean> getBookChapterUnlock(Long userId,Long chapterId);
+    RestResp<Integer> getBookChapterUnlock(Long userId,Long bookId,Long chapterId);
 
     /**
      * 获取所有小说ID列表

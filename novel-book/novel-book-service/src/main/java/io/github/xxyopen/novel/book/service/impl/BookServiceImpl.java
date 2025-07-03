@@ -19,6 +19,7 @@ import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.config.annotation.Key;
 import io.github.xxyopen.novel.config.annotation.Lock;
+import io.github.xxyopen.novel.user.dto.req.UserBookReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import io.github.xxyopen.novel.user.feign.UserFeign;
@@ -713,11 +714,11 @@ public class BookServiceImpl implements BookService {
         }
     }
     @Override
-    public RestResp<Boolean> getBookChapterUnlock(Long userId,Long chapterId){
+    public RestResp<Integer> getBookChapterUnlock(Long userId,Long bookId,Long chapterId){
         try{
             BookChapter chapter = bookChapterMapper.selectById(chapterId);
             if (chapter == null) {
-                return RestResp.ok( false);
+                return RestResp.ok( -1);
             }
             // 通过远程调用，保存用户阅读记录
             UserReadHistoryReqDto dto = new UserReadHistoryReqDto();
@@ -726,13 +727,19 @@ public class BookServiceImpl implements BookService {
             dto.setPreContentId(chapterId);
             dto.setUpdateTime(LocalDateTime.now());
             dto.setCreateTime(LocalDateTime.now());
-            userFeign.saveUserReadHistory(dto);
+            RestResp<Boolean>res=userFeign.saveUserReadHistory(dto);
             if(chapter.getIsVip() == 0){
-                return RestResp.ok(true);
+                return RestResp.ok(0);
             }
             QueryWrapper<ChapterUnlock> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("user_id", userId).eq("chapter_id", chapterId);
-            return RestResp.ok(chapterUnlockMapper.selectOne(queryWrapper) != null);
+            if(chapterUnlockMapper.selectOne(queryWrapper) != null){
+                return RestResp.ok(0);
+            }
+            if(res.getData()){
+                return RestResp.ok(1);
+            }
+            return RestResp.ok(2);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

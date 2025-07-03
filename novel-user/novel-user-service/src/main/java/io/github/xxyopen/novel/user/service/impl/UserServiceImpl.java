@@ -200,12 +200,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto) {
+    public RestResp<Boolean> saveUserReadHistory(UserReadHistoryReqDto dto) {
         QueryWrapper<UserReadHistory> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", dto.getUserId()).eq("book_id", dto.getBookId());
         UserReadHistory existing = userReadHistoryMapper.selectOne(queryWrapper);
         if(existing ==  null){
-            System.out.println("保存");
             UserReadHistory userReadHistory = new UserReadHistory();
             userReadHistory.setUserId(dto.getUserId());
             userReadHistory.setBookId(dto.getBookId());
@@ -213,16 +212,19 @@ public class UserServiceImpl implements UserService {
             userReadHistory.setCreateTime(LocalDateTime.now());
             userReadHistory.setUpdateTime(LocalDateTime.now());
             userReadHistoryMapper.insert(userReadHistory);
-            System.out.println("保存成功");
         }
         else{
-            System.out.println("更新");
             existing.setPreContentId(dto.getPreContentId());
             existing.setUpdateTime(LocalDateTime.now());
             userReadHistoryMapper.updateById(existing);
-            System.out.println("更新成功");
         }
-        return RestResp.ok();
+        // 查询当前书籍是否位于书架中
+        QueryWrapper<UserBookshelf> queryWrapper2 = new QueryWrapper<>();
+        queryWrapper2.eq("user_id", dto.getUserId()).eq("book_id", dto.getBookId());
+        if(userBookshelfMapper.selectOne(queryWrapper2) == null){
+            return RestResp.ok( false);
+        }
+        return RestResp.ok(true);
     }
     @Override
     public RestResp<PageRespDto<UserReadHistoryRespDto>> listUserReadHistory(Long userId, Integer pageNum, Integer pageSize){

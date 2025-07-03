@@ -97,7 +97,7 @@ public interface UserService {
     /**
      * 存储用户阅读记录
      */
-    RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto);
+    RestResp<Boolean> saveUserReadHistory(UserReadHistoryReqDto dto);
 
     /**
      * 获取用户阅读记录

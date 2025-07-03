@@ -2,6 +2,7 @@ package io.github.xxyopen.novel.user.feign;
 
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.user.dto.req.UserBookReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,7 +33,13 @@ public interface UserFeign {
      * 存储用户阅读记录
      */
     @PostMapping(ApiRouterConsts.API_INNER_USER_URL_PREFIX + "/saveUserReadHistory")
-    RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto);
+    RestResp<Boolean> saveUserReadHistory(UserReadHistoryReqDto dto);
+
+    /**
+     * 查询书籍是否位于书架中
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_USER_URL_PREFIX + "/isBookInShelf")
+    RestResp<Boolean> isBookInShelf(UserBookReqDto dto);
 
     @Component
     class UserFeignFallback implements UserFeign {
@@ -44,8 +51,15 @@ public interface UserFeign {
 
         }
         @Override
-        public RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto) {
-            return RestResp.ok();
+        public RestResp<Boolean> saveUserReadHistory(UserReadHistoryReqDto dto) {
+            System.out.println("调用用户服务失败，返回默认值");
+            return RestResp.ok(false);
+        }
+        @Override
+        public RestResp<Boolean> isBookInShelf(UserBookReqDto dto) {
+            System.out.println("调用用户服务失败，返回默认值");
+            System.out.println(dto);
+            return RestResp.ok(false);
         }
     }
 
