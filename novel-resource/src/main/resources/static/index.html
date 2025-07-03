@@ -895,14 +895,56 @@
         });
     };
 
-    // 修改翻页逻辑，确保最后一页不会与之前页重复
+    // // 修改翻页逻辑，确保最后一页不会与之前页重复
+    // async function fetchBooks(pageNum, pageSize) {
+    //     showLoading();
+    //     try {
+    //         // 确保页码不超过总页数
+    //         if (totalPages > 0 && pageNum > totalPages) {
+    //             pageNum = totalPages;
+    //         }
+    //
+    //         const response = await fetch(`http://127.0.0.1:8888/api/front/book/listAll?pageNum=${pageNum}&pageSize=${pageSize}`);
+    //
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP错误: ${response.status}`);
+    //         }
+    //
+    //         const data = await response.json();
+    //
+    //         if (data.code !== "00000") {
+    //             throw new Error(`API错误: ${data.message || '未知错误'}`);
+    //         }
+    //
+    //         // 更新全局变量
+    //         currentBooks = data.data.list || [];
+    //         totalBooks = data.data.total || 0;
+    //         totalPages = Math.ceil(totalBooks / pageSize);
+    //
+    //         // 计算总页数时使用向上取整
+    //         totalPages = Math.max(1, Math.ceil(totalBooks / pageSize));
+    //
+    //         // 如果当前页超过了总页数，重新请求最后一页
+    //         if (pageNum > totalPages && totalPages > 0) {
+    //             return fetchBooks(totalPages, pageSize);
+    //         }
+    //
+    //         // 渲染书籍列表
+    //         renderBooks();
+    //
+    //         // 更新分页控件
+    //         updatePaginationControls();
+    //     } catch (error) {
+    //         showStatusMessage(`获取书籍列表失败: ${error.message}`, 'error');
+    //     } finally {
+    //         hideLoading();
+    //     }
+    // }
     async function fetchBooks(pageNum, pageSize) {
         showLoading();
         try {
-            // 确保页码不超过总页数
-            if (totalPages > 0 && pageNum > totalPages) {
-                pageNum = totalPages;
-            }
+            // 确保页码有效
+            pageNum = Math.max(1, Math.min(pageNum, totalPages || 1));
 
             const response = await fetch(`http://127.0.0.1:8888/api/front/book/listAll?pageNum=${pageNum}&pageSize=${pageSize}`);
 
@@ -919,15 +961,8 @@
             // 更新全局变量
             currentBooks = data.data.list || [];
             totalBooks = data.data.total || 0;
-            totalPages = Math.ceil(totalBooks / pageSize);
-
-            // 计算总页数时使用向上取整
             totalPages = Math.max(1, Math.ceil(totalBooks / pageSize));
-
-            // 如果当前页超过了总页数，重新请求最后一页
-            if (pageNum > totalPages && totalPages > 0) {
-                return fetchBooks(totalPages, pageSize);
-            }
+            currentPage = pageNum; // 确保当前页与请求页一致
 
             // 渲染书籍列表
             renderBooks();

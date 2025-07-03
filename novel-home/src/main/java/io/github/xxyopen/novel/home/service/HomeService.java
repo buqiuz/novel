@@ -27,4 +27,11 @@ public interface HomeService {
      * @return 友情链接列表
      */
     RestResp<List<HomeFriendLinkRespDto>> listHomeFriendLinks();
+
+    /**
+     * 更新首页推荐小说
+     *
+     * @return 更新结果
+     */
+    RestResp<String> updateHomeBooks();
 }

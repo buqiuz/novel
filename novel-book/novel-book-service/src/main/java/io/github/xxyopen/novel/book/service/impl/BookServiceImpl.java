@@ -739,6 +739,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public RestResp<List<Long>> listAllBookIds() {
+        QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select(DatabaseConsts.CommonColumnEnum.ID.getName());
+        List<Long> bookIds = bookInfoMapper.selectList(queryWrapper)
+            .stream()
+            .map(BookInfo::getId)
+            .collect(Collectors.toList());
+        return RestResp.ok(bookIds);
+    }
+
+    @Override
     public RestResp<PageRespDto<BookInfo>> listAllBookInfos(Integer pageNum, Integer pageSize) {
         IPage<BookInfo> page = new Page<>();
         page.setCurrent(pageNum);

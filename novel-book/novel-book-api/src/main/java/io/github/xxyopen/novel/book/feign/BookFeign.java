@@ -113,6 +113,12 @@ public interface BookFeign {
     RestResp<Void> updateBook(@RequestBody BookUpdateReqDto dto);
 
     /**
+     * 获取所有小说ID
+     */
+    @GetMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/listAllBookIds")
+    RestResp<List<Long>> listAllBookIds();
+
+    /**
      * 章节解锁接口
      */
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/insertBookChapterUnlock")
@@ -207,6 +213,10 @@ public interface BookFeign {
         @Override
         public RestResp<Void> updateBook(BookUpdateReqDto dto) {
             return RestResp.fail(ErrorCodeEnum.THIRD_SERVICE_ERROR);
+        }
+        @Override
+        public RestResp<List<Long>> listAllBookIds() {
+            return RestResp.ok(new ArrayList<>(0));
         }
 
         @Override

@@ -158,6 +158,15 @@ public class InnerBookController {
     }
 
     /**
+     * 获取所有小说ID
+     */
+    @Operation(summary = "获取所有小说ID")
+    @GetMapping("listAllBookIds")
+    public RestResp<List<Long>> listAllBookIds() {
+        return bookService.listAllBookIds();
+    }
+
+    /**
      * 小说章节解锁接口
      */
     @Operation(summary = "小说章节解锁")

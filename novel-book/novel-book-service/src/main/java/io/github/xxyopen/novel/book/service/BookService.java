@@ -242,6 +242,13 @@ public interface BookService {
     RestResp<Boolean> getBookChapterUnlock(Long userId,Long chapterId);
 
     /**
+     * 获取所有小说ID列表
+     *
+     * @return 所有小说ID列表
+     */
+    RestResp<List<Long>> listAllBookIds();
+
+    /**
      * 查询所有小说信息列表
      *
      * @param pageNum 页码

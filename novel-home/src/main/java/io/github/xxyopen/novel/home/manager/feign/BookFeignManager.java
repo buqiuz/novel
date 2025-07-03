@@ -32,4 +32,17 @@ public class BookFeignManager {
         return new ArrayList<>(0);
     }
 
+    /**
+     * 获取所有小说ID
+     *
+     * @return 小说ID列表
+     */
+    public List<Long> listAllBookIds() {
+        RestResp<List<Long>> resp = bookFeign.listAllBookIds();
+        if (Objects.equals(ErrorCodeEnum.OK.getCode(), resp.getCode())) {
+            return resp.getData();
+        }
+        return new ArrayList<>(0);
+    }
+
 }

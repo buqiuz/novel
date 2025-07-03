@@ -178,7 +178,11 @@ public enum ErrorCodeEnum {
     /**
      * 用户金币更新失败
      */
-    USER_GOLD_UPDATE_ERROR("A3009", "用户金币更新失败");
+    USER_GOLD_UPDATE_ERROR("A3009", "用户金币更新失败"),
+    /**
+     * 更新推荐小说失败
+     */
+    UPDATE_HOME_BOOK_ERROR("A3010", "更新推荐小说失败");
 
     /**
      * 错误码

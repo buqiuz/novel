@@ -46,4 +46,12 @@ public class HomeController {
         return homeService.listHomeFriendLinks();
     }
 
+    /**
+     * 更新首页小说推荐接口（管理员使用）
+     */
+    @Operation(summary = "更新首页小说推荐")
+    @GetMapping("books/update")
+    public RestResp<String> updateHomeBooks() {
+        return homeService.updateHomeBooks();
+    }
 }
