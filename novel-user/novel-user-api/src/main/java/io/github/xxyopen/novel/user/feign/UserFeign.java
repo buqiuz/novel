@@ -2,6 +2,7 @@ package io.github.xxyopen.novel.user.feign;
 
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,12 @@ public interface UserFeign {
     @PostMapping(ApiRouterConsts.API_INNER_USER_URL_PREFIX + "/listUserInfoByIds")
     RestResp<List<UserInfoRespDto>> listUserInfoByIds(List<Long> userIds);
 
+    /**
+     * 存储用户阅读记录
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_USER_URL_PREFIX + "/saveUserReadHistory")
+    RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto);
+
     @Component
     class UserFeignFallback implements UserFeign {
 
@@ -35,6 +42,10 @@ public interface UserFeign {
 
             return RestResp.ok(new ArrayList<>(0));
 
+        }
+        @Override
+        public RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto) {
+            return RestResp.ok();
         }
     }
 

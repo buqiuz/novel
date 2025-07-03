@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 小说微服务内部调用接口
@@ -163,6 +164,23 @@ public class InnerBookController {
     @PostMapping("insertBookChapterUnlock")
     public RestResp<Boolean> insertBookChapterUnlock(@RequestBody @Valid ChapterUnlockReqDto dto) {
         return bookService.insertBookChapterUnlock(dto.getUserId(),dto.getChapterId());
+    }
+
+    /**
+     * 小说名批量查询接口
+     */
+    @Operation(summary = "小说名批量查询接口")
+    @PostMapping("listBookNames")
+    public RestResp<Map<Long, String>> listBookNames(@RequestBody List<Long> bookIds) {
+        return bookService.listBookNames(bookIds);
+    }
+    /**
+     * 小说章节名批量查询接口
+     */
+    @Operation(summary = "小说章节名批量查询接口")
+    @PostMapping("listChapterNames")
+    public RestResp<Map<Long, String>> listChapterNames(@RequestBody List<Long> chapterIds) {
+        return bookService.listChapterNames(chapterIds);
     }
 
 }

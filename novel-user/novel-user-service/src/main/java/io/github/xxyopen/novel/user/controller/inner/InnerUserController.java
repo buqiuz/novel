@@ -2,6 +2,8 @@ package io.github.xxyopen.novel.user.controller.inner;
 
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.user.dao.entity.UserReadHistory;
+import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import io.github.xxyopen.novel.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +34,15 @@ public class InnerUserController {
     @PostMapping("listUserInfoByIds")
     RestResp<List<UserInfoRespDto>> listUserInfoByIds(@RequestBody List<Long> userIds) {
         return userService.listUserInfoByIds(userIds);
+    }
+
+    /**
+     * 存储用户阅读记录
+     */
+    @Operation(summary = "存储用户阅读记录")
+    @PostMapping("saveUserReadHistory")
+    RestResp<Void> saveUserReadHistory(@RequestBody UserReadHistoryReqDto dto){
+        return userService.saveUserReadHistory(dto);
     }
 
 }

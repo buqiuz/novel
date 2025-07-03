@@ -4,12 +4,15 @@ import io.github.xxyopen.novel.book.dto.req.BookCommentReqDto;
 import io.github.xxyopen.novel.common.auth.UserHolder;
 import io.github.xxyopen.novel.common.constant.ApiRouterConsts;
 import io.github.xxyopen.novel.common.constant.SystemConfigConsts;
+import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.user.dao.entity.UserReadHistory;
 import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import io.github.xxyopen.novel.user.dto.resp.UserLoginRespDto;
+import io.github.xxyopen.novel.user.dto.resp.UserReadHistoryRespDto;
 import io.github.xxyopen.novel.user.dto.resp.UserRegisterRespDto;
 import io.github.xxyopen.novel.user.manager.feign.BookFeignManager;
 import io.github.xxyopen.novel.user.service.UserService;
@@ -145,6 +148,17 @@ public class FrontUserController {
     @GetMapping("bookshelf_status")
     public RestResp<Integer> getBookshelfStatus(@Parameter(description = "小说ID") String bookId) {
         return userService.getBookshelfStatus(UserHolder.getUserId(), bookId);
+    }
+
+    /**
+     * 查询用户阅读历史接口
+     */
+    @Operation(summary = "查询用户阅读历史接口")
+    @GetMapping("read_history")
+    public RestResp<PageRespDto<UserReadHistoryRespDto>> listUserReadHistory(
+            @Parameter(description = "页码") @RequestParam Integer pageNum,
+            @Parameter(description = "每页条数") @RequestParam Integer pageSize) {
+        return userService.listUserReadHistory(UserHolder.getUserId(), pageNum, pageSize);
     }
 
 }

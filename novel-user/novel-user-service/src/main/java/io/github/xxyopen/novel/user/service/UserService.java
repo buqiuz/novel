@@ -1,13 +1,16 @@
 package io.github.xxyopen.novel.user.service;
 
 
-import io.github.xxyopen.novel.book.dto.resp.BookEsRespDto;
+import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
+import io.github.xxyopen.novel.user.dao.entity.UserReadHistory;
 import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
+import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import io.github.xxyopen.novel.user.dto.resp.UserLoginRespDto;
+import io.github.xxyopen.novel.user.dto.resp.UserReadHistoryRespDto;
 import io.github.xxyopen.novel.user.dto.resp.UserRegisterRespDto;
 
 import java.util.List;
@@ -93,4 +96,14 @@ public interface UserService {
      * @param userId
      */
     RestResp<Void> delete(Long userId);
+
+    /**
+     * 存储用户阅读记录
+     */
+    RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto);
+
+    /**
+     * 获取用户阅读记录
+     */
+    RestResp<PageRespDto<UserReadHistoryRespDto>> listUserReadHistory(Long userId, Integer pageNum, Integer pageSize);
 }

@@ -14,7 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 小说微服务调用客户端
@@ -116,7 +118,17 @@ public interface BookFeign {
     @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/insertBookChapterUnlock")
     RestResp<Boolean> insertBookChapterUnlock(@RequestBody ChapterUnlockReqDto dto);
 
+    /**
+     * 小说名批量查询接口
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/listBookNames")
+    RestResp<Map<Long, String>> listBookNames(@RequestBody List<Long> bookIds);
 
+    /**
+     * 章节名批量查询接口
+     */
+    @PostMapping(ApiRouterConsts.API_INNER_BOOK_URL_PREFIX + "/listChapterNames")
+    RestResp<Map<Long, String>> listChapterNames(@RequestBody List<Long> chapterIds);
 
     @Component
     class BookFeignFallback implements BookFeign {
@@ -200,6 +212,16 @@ public interface BookFeign {
         @Override
         public RestResp<Boolean> insertBookChapterUnlock(ChapterUnlockReqDto dto) {
             return RestResp.ok( false);
+        }
+
+        @Override
+        public RestResp<Map<Long, String>> listBookNames(List<Long> bookIds) {
+            return RestResp.ok(new HashMap<>(0));
+        }
+
+        @Override
+        public RestResp<Map<Long, String>> listChapterNames(List<Long> chapterIds) {
+            return RestResp.ok(new HashMap<>(0));
         }
     }
 

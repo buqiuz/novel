@@ -1,26 +1,25 @@
 package io.github.xxyopen.novel.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.xxyopen.novel.book.feign.BookFeign;
 import io.github.xxyopen.novel.common.auth.JwtUtils;
 import io.github.xxyopen.novel.common.constant.CommonConsts;
 import io.github.xxyopen.novel.common.constant.DatabaseConsts;
 import io.github.xxyopen.novel.common.constant.ErrorCodeEnum;
 import io.github.xxyopen.novel.common.constant.SystemConfigConsts;
+import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.config.exception.BusinessException;
-import io.github.xxyopen.novel.user.dao.entity.UserBookshelf;
-import io.github.xxyopen.novel.user.dao.entity.UserFeedback;
-import io.github.xxyopen.novel.user.dao.entity.UserInfo;
-import io.github.xxyopen.novel.user.dao.entity.UserWallet;
-import io.github.xxyopen.novel.user.dao.mapper.UserBookshelfMapper;
-import io.github.xxyopen.novel.user.dao.mapper.UserFeedbackMapper;
-import io.github.xxyopen.novel.user.dao.mapper.UserInfoMapper;
-import io.github.xxyopen.novel.user.dao.mapper.UserWalletMapper;
+import io.github.xxyopen.novel.user.dao.entity.*;
+import io.github.xxyopen.novel.user.dao.mapper.*;
 import io.github.xxyopen.novel.user.dto.req.UserInfoUptReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserLoginReqDto;
+import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.req.UserRegisterReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
 import io.github.xxyopen.novel.user.dto.resp.UserLoginRespDto;
+import io.github.xxyopen.novel.user.dto.resp.UserReadHistoryRespDto;
 import io.github.xxyopen.novel.user.dto.resp.UserRegisterRespDto;
 import io.github.xxyopen.novel.user.manager.redis.VerifyCodeManager;
 import io.github.xxyopen.novel.user.service.UserService;
@@ -30,7 +29,9 @@ import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,10 @@ public class UserServiceImpl implements UserService {
     private final UserBookshelfMapper userBookshelfMapper;
 
     private final UserWalletMapper userWalletMapper;
+
+    private final UserReadHistoryMapper userReadHistoryMapper;
+
+    private final BookFeign bookFeign;
 
     @Override
     public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
@@ -197,4 +202,53 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public RestResp<Void> saveUserReadHistory(UserReadHistoryReqDto dto) {
+        QueryWrapper<UserReadHistory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", dto.getUserId()).eq("book_id", dto.getBookId());
+        UserReadHistory existing = userReadHistoryMapper.selectOne(queryWrapper);
+        if(existing ==  null){
+            System.out.println("保存");
+            UserReadHistory userReadHistory = new UserReadHistory();
+            userReadHistory.setUserId(dto.getUserId());
+            userReadHistory.setBookId(dto.getBookId());
+            userReadHistory.setPreContentId(dto.getPreContentId());
+            userReadHistory.setCreateTime(LocalDateTime.now());
+            userReadHistory.setUpdateTime(LocalDateTime.now());
+            userReadHistoryMapper.insert(userReadHistory);
+            System.out.println("保存成功");
+        }
+        else{
+            System.out.println("更新");
+            existing.setPreContentId(dto.getPreContentId());
+            existing.setUpdateTime(LocalDateTime.now());
+            userReadHistoryMapper.updateById(existing);
+            System.out.println("更新成功");
+        }
+        return RestResp.ok();
+    }
+    @Override
+    public RestResp<PageRespDto<UserReadHistoryRespDto>> listUserReadHistory(Long userId, Integer pageNum, Integer pageSize){
+        QueryWrapper<UserReadHistory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).orderByDesc("id");
+        Page<UserReadHistory> page = new Page<>(pageNum, pageSize);
+        Page<UserReadHistory> result = userReadHistoryMapper.selectPage(page, queryWrapper);
+        RestResp<Map<Long, String>> res1 = bookFeign.listBookNames(result.getRecords().stream().map(UserReadHistory::getBookId).toList());
+        Map<Long, String> bookNames = res1.getData();
+        RestResp<Map<Long, String>> res2 = bookFeign.listChapterNames(result.getRecords().stream().map(UserReadHistory::getPreContentId).toList());
+        Map<Long, String> chapterNames = res2.getData();
+        // 将结果转换为UserReadHistoryRespDTO
+        List<UserReadHistoryRespDto> dtoList = new ArrayList<>();
+        for (UserReadHistory history : result.getRecords()) {
+            UserReadHistoryRespDto dto = UserReadHistoryRespDto.builder()
+                    .bookId(history.getBookId())
+                    .preContentId(history.getPreContentId())
+                    .bookName(bookNames.getOrDefault(history.getBookId(), "未知小说"))
+                    .preChapterName(chapterNames.getOrDefault(history.getPreContentId(), "未知章节"))
+                    .updateTime(history.getUpdateTime())
+                    .build();
+            dtoList.add(dto);
+        }
+        return RestResp.ok(PageRespDto.of(pageNum, pageSize, result.getTotal(), dtoList));
+    }
 }

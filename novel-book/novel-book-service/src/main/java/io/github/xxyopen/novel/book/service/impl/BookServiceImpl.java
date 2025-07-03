@@ -19,7 +19,9 @@ import io.github.xxyopen.novel.common.resp.PageRespDto;
 import io.github.xxyopen.novel.common.resp.RestResp;
 import io.github.xxyopen.novel.config.annotation.Key;
 import io.github.xxyopen.novel.config.annotation.Lock;
+import io.github.xxyopen.novel.user.dto.req.UserReadHistoryReqDto;
 import io.github.xxyopen.novel.user.dto.resp.UserInfoRespDto;
+import io.github.xxyopen.novel.user.feign.UserFeign;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,6 +73,7 @@ public class BookServiceImpl implements BookService {
     private final ChapterUnlockMapper chapterUnlockMapper;
 
     private static final Integer REC_BOOK_COUNT = 4;
+    private final UserFeign userFeign;
 
     @Override
     public RestResp<List<BookRankRespDto>> listVisitRankBooks() {
@@ -716,6 +719,14 @@ public class BookServiceImpl implements BookService {
             if (chapter == null) {
                 return RestResp.ok( false);
             }
+            // 通过远程调用，保存用户阅读记录
+            UserReadHistoryReqDto dto = new UserReadHistoryReqDto();
+            dto.setUserId(userId);
+            dto.setBookId(chapter.getBookId());
+            dto.setPreContentId(chapterId);
+            dto.setUpdateTime(LocalDateTime.now());
+            dto.setCreateTime(LocalDateTime.now());
+            userFeign.saveUserReadHistory(dto);
             if(chapter.getIsVip() == 0){
                 return RestResp.ok(true);
             }
@@ -773,5 +784,20 @@ public class BookServiceImpl implements BookService {
             throw new RuntimeException(e);
         }
     }
-
+    @Override
+    public RestResp<Map<Long, String>> listBookNames(List<Long> bookIds){
+        if(bookIds.isEmpty()){
+            return RestResp.ok(new HashMap<>());
+        }
+        List<BookInfo> bookInfos = bookInfoMapper.selectBatchIds(bookIds);
+        return RestResp.ok(bookInfos.stream().collect(Collectors.toMap(BookInfo::getId, BookInfo::getBookName)));
+    }
+    @Override
+    public RestResp<Map<Long, String>> listChapterNames(List<Long> chapterIds){
+        if(chapterIds.isEmpty()){
+            return RestResp.ok(new HashMap<>());
+        }
+        List<BookChapter> bookChapters = bookChapterMapper.selectBatchIds(chapterIds);
+        return RestResp.ok(bookChapters.stream().collect(Collectors.toMap(BookChapter::getId, BookChapter::getChapterName)));
+    }
 }

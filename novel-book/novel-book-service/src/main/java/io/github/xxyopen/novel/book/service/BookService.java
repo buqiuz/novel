@@ -9,6 +9,7 @@ import io.github.xxyopen.novel.common.resp.RestResp;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 小说模块 服务类
@@ -258,4 +259,14 @@ public interface BookService {
      * @return 分页用户评论列表
      */
     RestResp<PageRespDto<UserCommentRespDto>> listUserComments(Long userId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 批量查询小说名
+     */
+    RestResp<Map<Long, String>> listBookNames(List<Long> bookIds);
+    /**
+     * 批量查询章节名
+     */
+    RestResp<Map<Long, String>> listChapterNames(List<Long> chapterIds);
+
 }
