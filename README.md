@@ -36,16 +36,9 @@
 
 novel-cloud 是 novel 项目的微服务版本，基于 `Spring Cloud 2022` & `Spring Cloud Alibaba 2022` 构建，数据结构、后端接口和 novel 项目保持完全一致，Vue 3 开发的前端能无缝对接这两个项目。
 
-[//]: # (## 项目地址)
-
-[//]: #
-[//]: # (- 单体架构后端项目：[GitHub]&#40;https://github.com/201206030/novel&#41; ｜ [码云]&#40;https://gitee.com/novel_dev_team/novel&#41; ｜ [文档]&#40;https://docs.xxyopen.com/course/novel&#41;)
-
-[//]: # (- 微服务架构后端项目：[GitHub]&#40;https://github.com/201206030/novel-cloud&#41; ｜ [码云]&#40;https://gitee.com/novel_dev_team/novel-cloud&#41; ｜ [文档]&#40;https://docs.xxyopen.com/course/novelcloud&#41;)
-
-[//]: # (- 前端项目：[GitHub]&#40;https://github.com/201206030/novel-front-web&#41; ｜ [码云]&#40;https://gitee.com/novel_dev_team/novel-front-web&#41;)
-
-[//]: # (- 线上应用版：[GitHub]&#40;https://github.com/201206030/novel-plus&#41; ｜ [码云]&#40;https://gitee.com/novel_dev_team/novel-plus&#41;)
+## 项目地址
+[前端地址](https://github.com/buqiuz/novel-front)
+[视频演示_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV16gHPzmE11/?vd_source=e2bd36731c71838c269342f8ba7755d3)
 
 ## 开发环境
 
@@ -100,8 +93,6 @@ novel-cloud 是 novel 项目的微服务版本，基于 `Spring Cloud 2022` & `S
 ![image-20251001232724164](https://buqiu-picgo.obs.cn-southwest-2.myhuaweicloud.com/PicGo/image-20251001232724164.png)
 
 ![image-20251001232815370](https://buqiu-picgo.obs.cn-southwest-2.myhuaweicloud.com/PicGo/image-20251001232815370.png)
-
-
 
 
 ## 项目结构
