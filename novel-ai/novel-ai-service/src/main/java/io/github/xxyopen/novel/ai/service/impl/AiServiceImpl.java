@@ -53,7 +53,7 @@ public class AiServiceImpl implements AiService {
     @Value("${spring.ai.dashscope.api-key}")
     private String dashScopeApiKey;
     private static final String model_qwen = "qwen-plus";
-    private static final String model_qwen_tts = "qwen-tts";
+    private static final String model_qwen_tts = "qwen-tts-latest";
     private static final String model_cosyvoice = "cosyvoice-v2";
     private static final String model_wanx = "wanx2.1-t2i-turbo";
     @Override
